@@ -41,18 +41,24 @@ class MokoHeroHelper
      */
     public static function getRandomImageUrl(Registry $params): string
     {
-        $folder = trim((string) $params->get('folder', 'images/headers'), '/\\ ');
+        // The folderlist field stores only the subfolder name (e.g. "headers"),
+        // relative to its `directory` attribute ("images"). Reconstruct the full
+        // site-root-relative path so we can resolve both the filesystem path and
+        // the public URL consistently.
+        $subfolder = trim((string) $params->get('folder', 'headers'), '/\\ ');
 
-        if ($folder === '') {
+        if ($subfolder === '') {
             return '';
         }
+
+        $folder   = 'images/' . $subfolder;
 
         // Build the absolute filesystem path relative to the Joomla root.
         $basePath = JPATH_SITE . '/' . $folder;
 
         if (!is_dir($basePath)) {
             Factory::getApplication()->enqueueMessage(
-                sprintf('mod_moko_hero: folder "%s" does not exist.', $folder),
+                sprintf('mod_moko_hero: folder "%s" does not exist. Check the Image Folder parameter.', $folder),
                 'warning'
             );
 

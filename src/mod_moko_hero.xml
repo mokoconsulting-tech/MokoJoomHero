@@ -10,11 +10,16 @@
     <version>1.0.0</version>
     <description>MOD_MOKO_HERO_XML_DESCRIPTION</description>
 
+    <!--
+        namespace path points at src/ which is now the module root itself.
+        Joomla resolves namespaces relative to the extension root, so
+        src/Helper/MokoHeroHelper.php → MokoConsulting\Module\MokoHero\Site\Helper\MokoHeroHelper
+    -->
     <namespace path="src">MokoConsulting\Module\MokoHero</namespace>
 
     <files>
         <filename module="mod_moko_hero">mod_moko_hero.php</filename>
-        <folder>src</folder>
+        <folder>Helper</folder>
         <folder>tmpl</folder>
         <folder>media</folder>
     </files>
@@ -33,13 +38,26 @@
 
             <fieldset name="basic" label="JGLOBAL_FIELDSET_DISPLAY_OPTIONS">
 
+                <!--
+                    folder field — uses Joomla's built-in "folderlist" field type.
+                    Renders a drop-down of all immediate subdirectories under the
+                    path specified in `directory` (relative to JPATH_SITE).
+                    Mirrors the approach used by mod_random_image.
+
+                    If you store hero images directly under images/ itself, change
+                    `directory` to "" and set `default` to "images".
+                -->
                 <field
                     name="folder"
-                    type="text"
+                    type="folderlist"
                     label="MOD_MOKO_HERO_FIELD_FOLDER_LABEL"
                     description="MOD_MOKO_HERO_FIELD_FOLDER_DESC"
-                    default="images/headers"
-                    filter="path"
+                    directory="images"
+                    default="headers"
+                    filter=""
+                    exclude="^\..*"
+                    hide_none="false"
+                    hide_default="false"
                     required="true"
                 />
 

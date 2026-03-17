@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    mod_moko_hero — Joomla Update Server manifest
+    Joomla's Extension Update component fetches this file to discover
+    available versions and their download URLs.
+
+    Host this file at a stable, publicly accessible URL and enter that URL
+    in Joomla Admin → Extensions > Manage > Update Sites.
+
+    Reference: https://docs.joomla.org/Deploying_an_Update_Server
+-->
+<updates>
+    <update>
+        <!-- Human-readable name shown in the Joomla Update Manager -->
+        <name>Moko Hero</name>
+
+        <!-- Must match the <name> key in mod_moko_hero.xml -->
+        <element>mod_moko_hero</element>
+
+        <!-- Extension type -->
+        <type>module</type>
+
+        <!-- "site" for frontend modules, "administrator" for backend -->
+        <client>site</client>
+
+        <!-- Semantic version of this release -->
+        <version>1.0.0</version>
+
+        <!-- Release notes shown to the administrator before updating -->
+        <description>
+            Initial release of mod_moko_hero. Displays a randomly selected
+            image from a configurable folder as the full-width background of
+            a hero overlay section.
+        </description>
+
+        <!-- Direct URL to the installable ZIP package -->
+        <downloadurl type="full" format="zip">
+            https://github.com/mokoconsulting-tech/MokoJoomHero/releases/download/v1.0.0/mod_moko_hero_v1.0.0.zip
+        </downloadurl>
+
+        <!-- Joomla version compatibility range -->
+        <targetplatform name="joomla" version="4\.[4-9]" />
+        <targetplatform name="joomla" version="5\.[0-9]" />
+
+        <!-- Minimum PHP version -->
+        <php_minimum>8.1</php_minimum>
+
+        <!--
+            SHA-256 checksum of the ZIP package.
+            Generate after building the release package:
+              sha256sum dist/mod_moko_hero_v1.0.0.zip
+            Then replace the placeholder below.
+        -->
+        <!-- <sha256>REPLACE_WITH_ACTUAL_SHA256_AFTER_BUILD</sha256> -->
+
+    </update>
+</updates>
