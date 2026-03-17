@@ -1,6 +1,6 @@
-# MokoStandards-Template-Joomla-Module
+# mod_moko_hero — Joomla Hero Background Image Module
 
-A repository template for Joomla Module development projects following MokoStandards.
+A Joomla 4/5 site module that displays a randomly selected image from a folder as the full-width CSS background of a hero overlay section — combining the image-scanning approach of `mod_random_image` with the visual overlay pattern of Cassiopeia's `mod_custom` banner layout override.
 
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
 
@@ -11,115 +11,130 @@ A repository template for Joomla Module development projects following MokoStand
 3. [Prerequisites](#prerequisites)
 4. [Installation](#installation)
 5. [Usage](#usage)
-6. [Project Structure](#project-structure)
-7. [Development](#development)
-8. [Testing](#testing)
-9. [Building](#building)
-10. [Contributing](#contributing)
-11. [Versioning](#versioning)
-12. [License](#license)
-13. [Support](#support)
+6. [Module Parameters](#module-parameters)
+7. [Project Structure](#project-structure)
+8. [Development](#development)
+9. [Testing](#testing)
+10. [Building](#building)
+11. [Contributing](#contributing)
+12. [Versioning](#versioning)
+13. [License](#license)
+14. [Support](#support)
 
 ## Overview
 
-This is a standardized template repository for creating Joomla modules that conform to Moko Consulting's development standards and best practices. It provides a consistent starting point with pre-configured tooling, documentation structure, and development workflows.
+`mod_moko_hero` scans a configurable image folder (relative to the Joomla root), picks a random supported image on each page load, and renders it as the `background-image` of a full-width hero block. A semi-transparent colour overlay is applied via a CSS `::before` pseudo-element — identical to the technique used by Cassiopeia's built-in banner override — so the overlay is purely decorative and does not affect accessibility.
 
-Use this template when creating new Joomla modules to ensure:
-- Consistent code structure and organization
-- Pre-configured development tools (linters, formatters)
-- Standardized documentation and contribution guidelines
-- Built-in build and deployment workflows
+Administrators control the hero title, body text, call-to-action button, height, overlay colour and opacity, content alignment, and background position — all from the standard Joomla module parameters UI.
 
 ## Features
 
-- **Standardized Structure**: Pre-organized directories for source code, documentation, and scripts
-- **Build Automation**: Makefile with common tasks (lint, build, package, install)
-- **Code Quality**: Pre-configured PHP linting and CodeSniffer for Joomla standards
-- **Development Tools**: EditorConfig for consistent coding styles across IDEs
-- **Documentation**: Template structure following MokoStandards documentation practices
-- **Git Configuration**: Pre-configured git attributes, ignore patterns, and commit message templates
+- **Random image selection** from any folder under the Joomla root (jpg, jpeg, png, gif, webp, avif)
+- **CSS overlay** with configurable colour and opacity via inline CSS custom properties
+- **Hero content** — title, rich-text body, and CTA button with configurable label and URL
+- **Responsive** — `clamp()`-based fluid typography, `min-height` in `vh` units, mobile padding adjustments
+- **Graceful fallback** — gradient background shown when no images are found; admin warning logged
+- **Accessible** — `role="banner"`, `aria-label`, and overlay excluded from the tab order
+- **Joomla 4 / 5 compatible** — PSR-4 namespaced Helper, `HTMLHelper::_('stylesheet', …)` asset loading
+- **Zero external dependencies** — no JavaScript, no Composer packages required
 
 ## Prerequisites
 
-Before using this template, ensure you have the following installed:
-
-- **PHP**: 7.4 or higher (8.0+ recommended for Joomla 4.x/5.x)
-- **Composer**: For PHP dependency management (optional but recommended)
-- **Joomla**: A working Joomla installation for testing (3.x, 4.x, or 5.x)
-- **PHP CodeSniffer**: For code quality checks (`composer global require squizlabs/php_codesniffer`)
-- **Make**: GNU Make for running build commands
+- **PHP**: 8.1 or higher (Joomla 4.4 / 5.x requirement)
+- **Joomla**: 4.4 or 5.x site installation for testing
+- **PHP CodeSniffer** *(optional)*: `composer global require squizlabs/php_codesniffer` for code-quality checks
+- **Make**: GNU Make for build commands
 - **Git**: For version control
 
 ## Installation
 
-### Using This Template
+### Via Joomla Extension Manager (recommended)
 
-1. **Create a new repository from this template**:
-	 - Click "Use this template" button on GitHub
-	 - Or clone and remove git history:
-		 ```bash
-		 git clone https://github.com/mokoconsulting-tech/MokoStandards-Template-Joomla-Module.git my-joomla-module
-		 cd my-joomla-module
-		 rm -rf .git
-		 git init
-		 ```
+1. Run `make build` to produce `dist/mod_moko_hero.zip`
+2. In Joomla Admin → **Extensions > Manage > Install**, upload the ZIP
+3. Go to **Extensions > Modules**, create a new **Moko Hero** module
+4. Set the **Image Folder** parameter (e.g. `images/headers`) and assign the module to a position
 
-2. **Customize for your module**:
-	 - Update `Makefile` with your module name, type, and version
-	 - Update this README with your module's specific information
-	 - Update LICENSE file with appropriate copyright holder
-	 - Create your module files in the `src/` directory
+### Development Symlink
 
-3. **Initialize git**:
-	 ```bash
-	 git add .
-	 git commit -m "feat: initial commit from template"
-	 ```
+```bash
+# Set JOOMLA_ROOT in the Makefile first
+make dev-install
+```
 
 ## Usage
 
 ### Quick Start
 
-1. **Configure your module** in the `Makefile`:
-	 ```makefile
-	 MODULE_NAME := yourmodulename
-	 MODULE_TYPE := site    # or 'admin' for backend modules
-	 MODULE_VERSION := 1.0.0
-	 ```
+1. **Build the package**:
+   ```bash
+   make build
+   ```
 
-2. **Run the help command** to see available tasks:
-	 ```bash
-	 make help
-	 ```
+2. **Install** the generated `dist/mod_moko_hero.zip` in your Joomla site
 
-3. **Develop your module** in the `src/` directory
+3. **Create a module instance** in Joomla Admin → Extensions > Modules → New → Moko Hero
 
-4. **Validate your code**:
-	 ```bash
-	 make validate
-	 ```
+4. **Upload images** to your chosen folder (default: `images/headers/`)
 
-5. **Build the module package**:
-	 ```bash
-	 make build
-	 ```
+5. **Configure parameters** — set title, text, CTA, overlay colour/opacity
 
-### Common Tasks
+6. **Assign** the module to a full-width position (e.g. `banner` in Cassiopeia) and publish
 
-See the [Development Guide](docs/DEVELOPMENT.md) for detailed development workflows.
+### Common Make Tasks
+
+```bash
+make help        # List all available tasks
+make validate    # PHP lint + CodeSniffer
+make build       # Create dist/mod_moko_hero.zip
+make dev-install # Symlink into JOOMLA_ROOT for live development
+```
+
+## Module Parameters
+
+### Basic
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| Image Folder | `images/headers` | Path relative to Joomla root containing hero images |
+| Hero Title | *(empty)* | `<h2>` heading rendered over the image |
+| Hero Text | *(empty)* | Supporting body text (safe HTML allowed) |
+| Call-to-Action URL | *(empty)* | URL for the CTA button; leave blank to hide |
+| Button Label | `Learn More` | Text on the CTA button |
+
+### Display Settings
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| Hero Height | `70vh` | CSS height (vh, px, %) |
+| Overlay Opacity | `0.45` | 0 = transparent → 1 = solid |
+| Overlay Colour | `#000000` | Colour of the overlay layer |
+| Content Alignment | `center` | Left / Centre / Right |
+| Text Colour | `#ffffff` | Colour for title, text, and button |
+| Background Position | `center center` | Focal point of the background image |
+
+### Supported Image Formats
+
+`jpg`, `jpeg`, `png`, `gif`, `webp`, `avif`
 
 ## Project Structure
 
 ```
-.
-├── docs/               # Documentation files
-├── scripts/            # Build and deployment scripts
-├── src/                # Module source code
-├── .editorconfig       # Editor configuration
-├── .gitignore          # Git ignore patterns
-├── .gitmessage         # Git commit message template
-├── Makefile            # Build automation
-└── README.md           # This file
+src/mod_moko_hero/
+├── mod_moko_hero.php          # Module entry point — bootstraps helper + layout
+├── mod_moko_hero.xml          # Extension manifest (params, namespace, files)
+├── src/
+│   └── Helper/
+│       └── MokoHeroHelper.php # PSR-4 helper — folder scan + random image URL
+├── tmpl/
+│   └── default.php            # Hero layout — CSS vars + accessible markup
+├── media/
+│   └── css/
+│       └── mod_moko_hero.css  # Overlay + typography styles (CSS custom properties)
+└── language/
+    └── en-GB/
+        ├── mod_moko_hero.ini      # Frontend strings
+        └── mod_moko_hero.sys.ini  # Admin (sys) strings
 ```
 
 ## Development

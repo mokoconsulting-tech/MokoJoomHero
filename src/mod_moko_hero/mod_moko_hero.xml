@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="module" client="site" method="upgrade">
+    <name>MOD_MOKO_HERO</name>
+    <author>Moko Consulting</author>
+    <authorEmail>hello@mokoconsulting.tech</authorEmail>
+    <authorUrl>https://mokoconsulting.tech</authorUrl>
+    <creationDate>2026-03</creationDate>
+    <copyright>Copyright (C) 2026 Moko Consulting. All rights reserved.</copyright>
+    <license>GNU General Public License version 3 or later</license>
+    <version>1.0.0</version>
+    <description>MOD_MOKO_HERO_XML_DESCRIPTION</description>
+
+    <namespace path="src">MokoConsulting\Module\MokoHero</namespace>
+
+    <files>
+        <filename module="mod_moko_hero">mod_moko_hero.php</filename>
+        <folder>src</folder>
+        <folder>tmpl</folder>
+        <folder>media</folder>
+    </files>
+
+    <languages folder="language">
+        <language tag="en-GB">en-GB/mod_moko_hero.ini</language>
+        <language tag="en-GB">en-GB/mod_moko_hero.sys.ini</language>
+    </languages>
+
+    <media destination="mod_moko_hero" folder="media">
+        <folder>css</folder>
+    </media>
+
+    <config>
+        <fields name="params">
+
+            <fieldset name="basic" label="JGLOBAL_FIELDSET_DISPLAY_OPTIONS">
+
+                <field
+                    name="folder"
+                    type="text"
+                    label="MOD_MOKO_HERO_FIELD_FOLDER_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_FOLDER_DESC"
+                    default="images/headers"
+                    filter="path"
+                    required="true"
+                />
+
+                <field
+                    name="hero_title"
+                    type="text"
+                    label="MOD_MOKO_HERO_FIELD_TITLE_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_TITLE_DESC"
+                    default=""
+                />
+
+                <field
+                    name="hero_text"
+                    type="textarea"
+                    label="MOD_MOKO_HERO_FIELD_TEXT_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_TEXT_DESC"
+                    rows="4"
+                    default=""
+                    filter="safehtml"
+                />
+
+                <field
+                    name="link"
+                    type="url"
+                    label="MOD_MOKO_HERO_FIELD_LINK_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_LINK_DESC"
+                    default=""
+                    filter="url"
+                />
+
+                <field
+                    name="link_text"
+                    type="text"
+                    label="MOD_MOKO_HERO_FIELD_LINK_TEXT_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_LINK_TEXT_DESC"
+                    default="Learn More"
+                />
+
+            </fieldset>
+
+            <fieldset name="display" label="MOD_MOKO_HERO_FIELDSET_DISPLAY">
+
+                <field
+                    name="height"
+                    type="text"
+                    label="MOD_MOKO_HERO_FIELD_HEIGHT_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_HEIGHT_DESC"
+                    default="70vh"
+                />
+
+                <field
+                    name="overlay_opacity"
+                    type="range"
+                    label="MOD_MOKO_HERO_FIELD_OVERLAY_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_OVERLAY_DESC"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    default="0.45"
+                />
+
+                <field
+                    name="overlay_color"
+                    type="color"
+                    label="MOD_MOKO_HERO_FIELD_OVERLAY_COLOR_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_OVERLAY_COLOR_DESC"
+                    default="#000000"
+                />
+
+                <field
+                    name="content_align"
+                    type="list"
+                    label="MOD_MOKO_HERO_FIELD_ALIGN_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_ALIGN_DESC"
+                    default="center"
+                >
+                    <option value="flex-start">JGLOBAL_LEFT</option>
+                    <option value="center">JGLOBAL_CENTER</option>
+                    <option value="flex-end">JGLOBAL_RIGHT</option>
+                </field>
+
+                <field
+                    name="text_color"
+                    type="color"
+                    label="MOD_MOKO_HERO_FIELD_TEXT_COLOR_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_TEXT_COLOR_DESC"
+                    default="#ffffff"
+                />
+
+                <field
+                    name="bg_position"
+                    type="list"
+                    label="MOD_MOKO_HERO_FIELD_BG_POSITION_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_BG_POSITION_DESC"
+                    default="center center"
+                >
+                    <option value="center center">MOD_MOKO_HERO_BG_CENTER</option>
+                    <option value="center top">MOD_MOKO_HERO_BG_TOP</option>
+                    <option value="center bottom">MOD_MOKO_HERO_BG_BOTTOM</option>
+                </field>
+
+            </fieldset>
+
+        </fields>
+    </config>
+</extension>
