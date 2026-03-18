@@ -13,7 +13,7 @@ namespace MokoConsulting\Module\MokoHero\Site\Dispatcher;
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Dispatcher\AbstractModuleDispatcher;
-use Joomla\CMS\Helper\HelperFactoryAwareTrait;
+use MokoConsulting\Module\MokoHero\Site\Helper\MokoHeroHelper;
 
 /**
  * Dispatcher for mod_moko_hero.
@@ -23,8 +23,6 @@ use Joomla\CMS\Helper\HelperFactoryAwareTrait;
  */
 class Dispatcher extends AbstractModuleDispatcher
 {
-    use HelperFactoryAwareTrait;
-
     /**
      * Returns the layout data array passed into the template.
      *
@@ -34,7 +32,7 @@ class Dispatcher extends AbstractModuleDispatcher
     {
         $data   = parent::getLayoutData();
         $params = $data['params'];
-        $helper = $this->getHelperFactory()->getHelper('MokoHeroHelper');
+        $helper = new MokoHeroHelper();
 
         $displayMode = $params->get('display_mode', 'random');
 
