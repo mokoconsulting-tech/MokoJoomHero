@@ -10,7 +10,7 @@
  * Layout mirrors the Cassiopeia mod_custom "banner" override structure:
  *
  *   <div class="container-banner [mod-moko-hero--*]" …>   ← outer / bg layer
- *     <div class="banner-overlay">                         ← content panel
+ *     <div class="overlay">                         ← content panel
  *       <div class="mod-moko-hero__text1">…</div>          ← WYSIWYG level 1
  *       <div class="mod-moko-hero__text2">…</div>          ← WYSIWYG level 2
  *       <div class="mod-moko-hero__text3">…</div>          ← WYSIWYG level 3
@@ -157,7 +157,7 @@ $inlineStyle = implode(';', $cssVars);
     <?php endif; ?>
 
     <?php if ($hasContent) : ?>
-    <div class="banner-overlay">
+    <div class="overlay">
 
         <?php if ($text1 !== '') : ?>
         <div class="mod-moko-hero__text1"><?php echo $text1; ?></div>

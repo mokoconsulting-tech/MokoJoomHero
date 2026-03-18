@@ -1,7 +1,7 @@
 /**
  * mod_moko_hero — Hero background-image/video/slideshow module
  *
- * Built on top of Cassiopeia's native .container-banner / .banner-overlay
+ * Built on top of Cassiopeia's native .container-banner / .overlay
  * class pair (used by the mod_custom "banner" template override), so
  * Cassiopeia's own rules for those selectors apply automatically.
  *
@@ -15,7 +15,7 @@
  * Selector strategy
  * -----------------
  * .container-banner.mod-moko-hero   — outer wrapper (bg image / video layer)
- * .banner-overlay                   — Cassiopeia-native content panel
+ * .overlay                   — Cassiopeia-native content panel
  * .mod-moko-hero__slide             — slideshow slide layer
  * .mod-moko-hero__video             — <video> element (single or per-slide)
  */
@@ -55,13 +55,13 @@
     z-index: 1;
 }
 
-/* ── .banner-overlay content panel ─────────────────────────────────────────── */
+/* ── .overlay content panel ─────────────────────────────────────────── */
 /*
- * Cassiopeia's own stylesheet already centres and styles .banner-overlay.
+ * Cassiopeia's own stylesheet already centres and styles .overlay.
  * We only layer it above the ::before overlay and respect the colour/align
  * CSS variables passed from the module params.
  */
-.container-banner.mod-moko-hero .banner-overlay {
+.container-banner.mod-moko-hero .overlay {
     position: relative;
     z-index: 2;
     color: var(--moko-hero-text-color, #fff);
@@ -71,13 +71,13 @@
 }
 
 /* Ensure child typography inherits the configured text colour */
-.container-banner.mod-moko-hero .banner-overlay h1,
-.container-banner.mod-moko-hero .banner-overlay .lead,
-.container-banner.mod-moko-hero .banner-overlay p {
+.container-banner.mod-moko-hero .overlay h1,
+.container-banner.mod-moko-hero .overlay .lead,
+.container-banner.mod-moko-hero .overlay p {
     color: inherit;
 }
 
-.container-banner.mod-moko-hero .banner-overlay h1 {
+.container-banner.mod-moko-hero .overlay h1 {
     text-shadow: 0 2px 8px rgba(0, 0, 0, .35);
 }
 
@@ -140,7 +140,7 @@
  *   z-index stack (bottom → top):
  *   0  .mod-moko-hero__slide  (bg layers)
  *   1  .mod-moko-hero::before (colour overlay)
- *   2  .banner-overlay        (text content)
+ *   2  .overlay        (text content)
  */
 .mod-moko-hero__slide {
     position: absolute;
@@ -232,7 +232,7 @@
 
 /* ── Responsive adjustments ─────────────────────────────────────────────────── */
 @media (max-width: 767.98px) {
-    .container-banner.mod-moko-hero .banner-overlay {
+    .container-banner.mod-moko-hero .overlay {
         padding-block: 2.5rem;
     }
 }
