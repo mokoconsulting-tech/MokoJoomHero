@@ -61,40 +61,148 @@
                     required="true"
                 />
 
+                <!-- ── Text levels (WYSIWYG) ───────────────────────────── -->
+
                 <field
-                    name="hero_title"
+                    name="text1"
+                    type="editor"
+                    label="MOD_MOKO_HERO_FIELD_TEXT1_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_TEXT1_DESC"
+                    default=""
+                    filter="raw"
+                    buttons="true"
+                    hide="pagebreak,readmore"
+                />
+
+                <field
+                    name="text2"
+                    type="editor"
+                    label="MOD_MOKO_HERO_FIELD_TEXT2_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_TEXT2_DESC"
+                    default=""
+                    filter="raw"
+                    buttons="true"
+                    hide="pagebreak,readmore"
+                />
+
+                <field
+                    name="text3"
+                    type="editor"
+                    label="MOD_MOKO_HERO_FIELD_TEXT3_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_TEXT3_DESC"
+                    default=""
+                    filter="raw"
+                    buttons="true"
+                    hide="pagebreak,readmore"
+                />
+
+                <!-- ── Button 1 (always shown) ─────────────────────────── -->
+
+                <field
+                    name="btn1_label"
                     type="text"
-                    label="MOD_MOKO_HERO_FIELD_TITLE_LABEL"
-                    description="MOD_MOKO_HERO_FIELD_TITLE_DESC"
+                    label="MOD_MOKO_HERO_FIELD_BTN1_LABEL_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_BTN_LABEL_DESC"
                     default=""
                 />
 
                 <field
-                    name="hero_text"
-                    type="textarea"
-                    label="MOD_MOKO_HERO_FIELD_TEXT_LABEL"
-                    description="MOD_MOKO_HERO_FIELD_TEXT_DESC"
-                    rows="4"
-                    default=""
-                    filter="safehtml"
-                />
-
-                <field
-                    name="link"
+                    name="btn1_url"
                     type="url"
-                    label="MOD_MOKO_HERO_FIELD_LINK_LABEL"
-                    description="MOD_MOKO_HERO_FIELD_LINK_DESC"
+                    label="MOD_MOKO_HERO_FIELD_BTN1_URL_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_BTN_URL_DESC"
                     default=""
                     filter="url"
+                    showon="btn1_label!:"
                 />
 
                 <field
-                    name="link_text"
+                    name="btn1_style"
+                    type="list"
+                    label="MOD_MOKO_HERO_FIELD_BTN_STYLE_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_BTN_STYLE_DESC"
+                    default="btn-primary"
+                    showon="btn1_label!:"
+                >
+                    <option value="btn-primary">MOD_MOKO_HERO_BTN_STYLE_PRIMARY</option>
+                    <option value="btn-secondary">MOD_MOKO_HERO_BTN_STYLE_SECONDARY</option>
+                    <option value="btn-outline-primary">MOD_MOKO_HERO_BTN_STYLE_OUTLINE_PRIMARY</option>
+                    <option value="btn-outline-light">MOD_MOKO_HERO_BTN_STYLE_OUTLINE_LIGHT</option>
+                    <option value="btn-light">MOD_MOKO_HERO_BTN_STYLE_LIGHT</option>
+                    <option value="btn-dark">MOD_MOKO_HERO_BTN_STYLE_DARK</option>
+                </field>
+
+                <!-- ── Button 2 ────────────────────────────────────────── -->
+
+                <field
+                    name="btn2_label"
                     type="text"
-                    label="MOD_MOKO_HERO_FIELD_LINK_TEXT_LABEL"
-                    description="MOD_MOKO_HERO_FIELD_LINK_TEXT_DESC"
-                    default="Learn More"
+                    label="MOD_MOKO_HERO_FIELD_BTN2_LABEL_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_BTN_LABEL_DESC"
+                    default=""
                 />
+
+                <field
+                    name="btn2_url"
+                    type="url"
+                    label="MOD_MOKO_HERO_FIELD_BTN2_URL_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_BTN_URL_DESC"
+                    default=""
+                    filter="url"
+                    showon="btn2_label!:"
+                />
+
+                <field
+                    name="btn2_style"
+                    type="list"
+                    label="MOD_MOKO_HERO_FIELD_BTN_STYLE_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_BTN_STYLE_DESC"
+                    default="btn-outline-light"
+                    showon="btn2_label!:"
+                >
+                    <option value="btn-primary">MOD_MOKO_HERO_BTN_STYLE_PRIMARY</option>
+                    <option value="btn-secondary">MOD_MOKO_HERO_BTN_STYLE_SECONDARY</option>
+                    <option value="btn-outline-primary">MOD_MOKO_HERO_BTN_STYLE_OUTLINE_PRIMARY</option>
+                    <option value="btn-outline-light">MOD_MOKO_HERO_BTN_STYLE_OUTLINE_LIGHT</option>
+                    <option value="btn-light">MOD_MOKO_HERO_BTN_STYLE_LIGHT</option>
+                    <option value="btn-dark">MOD_MOKO_HERO_BTN_STYLE_DARK</option>
+                </field>
+
+                <!-- ── Button 3 ────────────────────────────────────────── -->
+
+                <field
+                    name="btn3_label"
+                    type="text"
+                    label="MOD_MOKO_HERO_FIELD_BTN3_LABEL_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_BTN_LABEL_DESC"
+                    default=""
+                />
+
+                <field
+                    name="btn3_url"
+                    type="url"
+                    label="MOD_MOKO_HERO_FIELD_BTN3_URL_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_BTN_URL_DESC"
+                    default=""
+                    filter="url"
+                    showon="btn3_label!:"
+                />
+
+                <field
+                    name="btn3_style"
+                    type="list"
+                    label="MOD_MOKO_HERO_FIELD_BTN_STYLE_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_BTN_STYLE_DESC"
+                    default="btn-secondary"
+                    showon="btn3_label!:"
+                >
+                    <option value="btn-primary">MOD_MOKO_HERO_BTN_STYLE_PRIMARY</option>
+                    <option value="btn-secondary">MOD_MOKO_HERO_BTN_STYLE_SECONDARY</option>
+                    <option value="btn-outline-primary">MOD_MOKO_HERO_BTN_STYLE_OUTLINE_PRIMARY</option>
+                    <option value="btn-outline-light">MOD_MOKO_HERO_BTN_STYLE_OUTLINE_LIGHT</option>
+                    <option value="btn-light">MOD_MOKO_HERO_BTN_STYLE_LIGHT</option>
+                    <option value="btn-dark">MOD_MOKO_HERO_BTN_STYLE_DARK</option>
+                </field>
 
             </fieldset>
 

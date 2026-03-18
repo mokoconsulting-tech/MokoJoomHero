@@ -81,6 +81,51 @@
     text-shadow: 0 2px 8px rgba(0, 0, 0, .35);
 }
 
+/* ── Text levels ────────────────────────────────────────────────────────────── */
+/*
+ * Each level is a free WYSIWYG region. Default sizing steps down from large
+ * (level 1) to body-scale (level 3) to reinforce visual hierarchy, but
+ * administrators can override via the editor's own heading/paragraph styles.
+ */
+.container-banner.mod-moko-hero .mod-moko-hero__text1 {
+    font-size: clamp(1.75rem, 5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-block-end: 0.75rem;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, .35);
+}
+
+.container-banner.mod-moko-hero .mod-moko-hero__text2 {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    font-weight: 400;
+    line-height: 1.4;
+    margin-block-end: 0.75rem;
+    opacity: .95;
+}
+
+.container-banner.mod-moko-hero .mod-moko-hero__text3 {
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    line-height: 1.6;
+    margin-block-end: 1.5rem;
+    opacity: .85;
+}
+
+/* Strip bottom margin from the last paragraph in each level */
+.container-banner.mod-moko-hero .mod-moko-hero__text1 p:last-child,
+.container-banner.mod-moko-hero .mod-moko-hero__text2 p:last-child,
+.container-banner.mod-moko-hero .mod-moko-hero__text3 p:last-child {
+    margin-block-end: 0;
+}
+
+/* ── Button group ────────────────────────────────────────────────────────────── */
+.container-banner.mod-moko-hero .mod-moko-hero__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: var(--moko-hero-align, center);
+    margin-block-start: 1.5rem;
+}
+
 /* ── Slideshow ──────────────────────────────────────────────────────────────── */
 /*
  * Pure-CSS crossfade slideshow — no JavaScript required.
