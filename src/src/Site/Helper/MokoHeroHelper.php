@@ -8,7 +8,7 @@
  * @license     GNU General Public License version 3 or later
  */
 
-namespace MokoConsulting\Module\MokoHero\Helper;
+namespace MokoConsulting\Module\MokoHero\Site\Helper;
 
 defined('_JEXEC') or die;
 
@@ -54,7 +54,7 @@ class MokoHeroHelper
      *
      * @return  array<int, array{url: string, type: string, mime: string}>
      */
-    public static function getAllMedia(Registry $params): array
+    public function getAllMedia(Registry $params): array
     {
         // folderlist field stores only the subfolder name (e.g. "headers"),
         // relative to its `directory` attribute ("images").
@@ -76,13 +76,13 @@ class MokoHeroHelper
             return [];
         }
 
-        $filenames = self::scanFolder($basePath);
+        $filenames = $this->scanFolder($basePath);
 
         if (empty($filenames)) {
             return [];
         }
 
-        $base = Uri::root(true) . '/' . $folder . '/';
+        $base  = Uri::root(true) . '/' . $folder . '/';
         $items = [];
 
         foreach ($filenames as $filename) {
@@ -107,9 +107,9 @@ class MokoHeroHelper
      *
      * @return  array{url: string, type: string, mime: string}|array{}
      */
-    public static function getRandomMedia(Registry $params): array
+    public function getRandomMedia(Registry $params): array
     {
-        $all = self::getAllMedia($params);
+        $all = $this->getAllMedia($params);
 
         if (empty($all)) {
             return [];
@@ -125,7 +125,7 @@ class MokoHeroHelper
      *
      * @return  string[]
      */
-    private static function scanFolder(string $path): array
+    private function scanFolder(string $path): array
     {
         $supported = array_merge(self::IMAGE_TYPES, self::VIDEO_TYPES);
         $files     = [];

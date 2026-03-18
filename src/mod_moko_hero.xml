@@ -11,15 +11,15 @@
     <description>MOD_MOKO_HERO_XML_DESCRIPTION</description>
 
     <!--
-        path="" means the PSR-4 root is the module directory itself.
-        MokoConsulting\Module\MokoHero\Helper\MokoHeroHelper
-          → modules/mod_moko_hero/Helper/MokoHeroHelper.php
+        path="src" maps the PSR-4 root to the module's src/ subdirectory.
+        MokoConsulting\Module\MokoHero\Site\Helper\MokoHeroHelper
+          → modules/mod_moko_hero/src/Site/Helper/MokoHeroHelper.php
     -->
-    <namespace path="">MokoConsulting\Module\MokoHero</namespace>
+    <namespace path="src">MokoConsulting\Module\MokoHero</namespace>
 
     <files>
-        <filename module="mod_moko_hero">mod_moko_hero.php</filename>
-        <folder>Helper</folder>
+        <folder module="mod_moko_hero">services</folder>
+        <folder>src</folder>
         <folder>tmpl</folder>
         <folder>media</folder>
     </files>

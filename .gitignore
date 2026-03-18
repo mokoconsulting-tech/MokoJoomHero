@@ -100,6 +100,13 @@ build/
 dist/
 out/
 site/
+# Un-ignore the module's PSR-4 source tree (Windows git case-insensitively matches Site/ above)
+!src/src/
+!src/src/Site/
+!src/src/Site/Helper/
+!src/src/Site/Helper/MokoHeroHelper.php
+!src/src/Site/Dispatcher/
+!src/src/Site/Dispatcher/Dispatcher.php
 *.map
 *.css.map
 *.js.map
