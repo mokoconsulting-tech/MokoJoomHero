@@ -54,7 +54,9 @@ $text1 = trim((string) $params->get('text1', ''));
 $text2 = trim((string) $params->get('text2', ''));
 $text3 = trim((string) $params->get('text3', ''));
 
-// ── Buttons (label drives visibility; URL + style are companions) ─────────────
+// ── Buttons — collected when a label is present ───────────────────────────────
+// icon is a FontAwesome class string (e.g. "fas fa-arrow-right"); rendered as
+// <i class="..." aria-hidden="true"></i> before the label text.
 $buttons = [];
 foreach ([1, 2, 3] as $n) {
     $label = trim((string) $params->get('btn' . $n . '_label', ''));
@@ -63,6 +65,7 @@ foreach ([1, 2, 3] as $n) {
     }
     $buttons[] = [
         'label' => $label,
+        'icon'  => trim((string) $params->get('btn' . $n . '_icon',  '')),
         'url'   => trim((string) $params->get('btn' . $n . '_url',   '')),
         'style' => $params->get('btn' . $n . '_style', 'btn-primary'),
     ];
@@ -174,7 +177,7 @@ $inlineStyle = implode(';', $cssVars);
             <a
                 href="<?php echo htmlspecialchars($btn['url'], ENT_QUOTES, 'UTF-8'); ?>"
                 class="btn btn-lg <?php echo htmlspecialchars($btn['style'], ENT_QUOTES, 'UTF-8'); ?>"
-            ><?php echo htmlspecialchars($btn['label'], ENT_QUOTES, 'UTF-8'); ?></a>
+            ><?php if ($btn['icon'] !== '') : ?><i class="<?php echo htmlspecialchars($btn['icon'], ENT_QUOTES, 'UTF-8'); ?>" aria-hidden="true"></i> <?php endif; ?><?php echo htmlspecialchars($btn['label'], ENT_QUOTES, 'UTF-8'); ?></a>
             <?php endforeach; ?>
         </div>
         <?php endif; ?>
