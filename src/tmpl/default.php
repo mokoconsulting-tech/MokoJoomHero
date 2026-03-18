@@ -6,6 +6,20 @@
  *
  * @copyright   Copyright (C) 2026 Moko Consulting. All rights reserved.
  * @license     GNU General Public License version 3 or later
+ *
+ * Layout mirrors the Cassiopeia mod_custom "banner" override structure:
+ *
+ *   <div class="container-banner [mod-moko-hero--*]" …>   ← outer / bg layer
+ *     <div class="banner-overlay">                         ← content panel
+ *       <h1 class="display-4 text-thin">…</h1>
+ *       <div class="lead">…</div>
+ *       <p><a class="btn btn-primary btn-lg">…</a></p>
+ *     </div>
+ *   </div>
+ *
+ * Using .container-banner and .banner-overlay means Cassiopeia's built-in CSS
+ * rules for those selectors apply here automatically, keeping both modules
+ * visually consistent on the same site.
  */
 
 defined('_JEXEC') or die;
@@ -15,11 +29,12 @@ use Joomla\CMS\Language\Text;
 
 /**
  * Variables provided by mod_moko_hero.php:
- * @var \Joomla\Registry\Registry $params
- * @var string  $displayMode  'random' | 'slideshow'
- * @var string  $mediaUrl     Root-relative URL (random mode) or '' (slideshow mode)
- * @var string  $mediaType    'image' | 'video' | ''
- * @var array   $slides       Full media list (slideshow mode) or []
+ * @var \Joomla\Registry\Registry    $params
+ * @var \Joomla\CMS\Object\CMSObject $module
+ * @var string  $displayMode   'random' | 'slideshow'
+ * @var string  $mediaUrl      Root-relative URL (random mode) or ''
+ * @var string  $mediaType     'image' | 'video' | ''
+ * @var array   $slides        Full media list (slideshow mode) or []
  */
 
 HTMLHelper::_('stylesheet', 'mod_moko_hero/mod_moko_hero.css', ['version' => 'auto', 'relative' => true]);
@@ -44,11 +59,13 @@ $isImage     = $mediaType === 'image';
 $isVideo     = $mediaType === 'video';
 $hasMedia    = $mediaUrl !== '' || !empty($slides);
 
-// ── CSS modifier classes ───────────────────────────────────────────────────────
-$modClasses = ['mod-moko-hero'];
-if (!$hasMedia)  { $modClasses[] = 'mod-moko-hero--no-media'; }
-if ($isVideo)    { $modClasses[] = 'mod-moko-hero--video'; }
-if ($isSlideshow){ $modClasses[] = 'mod-moko-hero--slideshow'; }
+// ── Root element classes ──────────────────────────────────────────────────────
+// .container-banner  — Cassiopeia-native outer wrapper (same as mod_custom banner)
+// .mod-moko-hero     — our scoping prefix for module-specific rules
+$modClasses = ['container-banner', 'mod-moko-hero'];
+if (!$hasMedia)   { $modClasses[] = 'mod-moko-hero--no-media'; }
+if ($isVideo)     { $modClasses[] = 'mod-moko-hero--video'; }
+if ($isSlideshow) { $modClasses[] = 'mod-moko-hero--slideshow'; }
 
 // ── Inline CSS custom properties ───────────────────────────────────────────────
 $cssVars = [
@@ -61,18 +78,16 @@ $cssVars = [
 ];
 
 if ($isImage) {
-    // Single image: set as CSS background-image variable
     $cssVars[] = '--moko-hero-bg-image:url(' . htmlspecialchars($mediaUrl, ENT_QUOTES, 'UTF-8') . ')';
 }
 
 if ($isSlideshow && !empty($slides)) {
-    $count = count($slides);
-    // Total cycle = each slide shown for $slideDuration + $slideTransition seconds
+    $count         = count($slides);
     $cycleDuration = ($slideDuration + $slideTransition) * $count;
-    $cssVars[] = '--moko-slideshow-count:'      . $count;
-    $cssVars[] = '--moko-slideshow-duration:'   . $slideDuration . 's';
-    $cssVars[] = '--moko-slideshow-transition:' . $slideTransition . 's';
-    $cssVars[] = '--moko-slideshow-cycle:'      . $cycleDuration . 's';
+    $cssVars[]     = '--moko-slideshow-count:'      . $count;
+    $cssVars[]     = '--moko-slideshow-duration:'   . $slideDuration . 's';
+    $cssVars[]     = '--moko-slideshow-transition:' . $slideTransition . 's';
+    $cssVars[]     = '--moko-slideshow-cycle:'      . $cycleDuration . 's';
 }
 
 $inlineStyle = implode(';', $cssVars);
@@ -86,67 +101,39 @@ $hasContent  = $heroTitle !== '' || $heroText !== '' || $link !== '';
     aria-label="<?php echo $heroTitle !== '' ? htmlspecialchars($heroTitle, ENT_QUOTES, 'UTF-8') : Text::_('MOD_MOKO_HERO_ARIA_LABEL'); ?>"
 >
 
-    <?php if ($isSlideshow && !empty($slides)) : ?>
-    <!--
-        Slideshow: each slide is absolutely stacked. CSS @keyframes on
-        .mod-moko-hero__slide drives opacity crossfades. Per-slide
-        animation-delay is calculated inline so the timing auto-scales
-        to any number of images — no JavaScript required.
-    -->
-    <?php
-    $count           = count($slides);
-    $cycleTotalMs    = ($slideDuration + $slideTransition) * $count;
-    foreach ($slides as $i => $slide) :
-        $delaySeconds  = ($slideDuration + $slideTransition) * $i;
-        $slideIsVideo  = $slide['type'] === 'video';
-        $slideStyle    = 'animation-delay:' . $delaySeconds . 's;animation-duration:' . $cycleTotalMs . 's;';
-        if (!$slideIsVideo) {
-            $slideStyle .= 'background-image:url(' . htmlspecialchars($slide['url'], ENT_QUOTES, 'UTF-8') . ');';
-        }
+    <?php if ($isSlideshow && !empty($slides)) :
+        $count     = count($slides);
+        $cycleTime = ($slideDuration + $slideTransition) * $count;
+        foreach ($slides as $i => $slide) :
+            $delay        = ($slideDuration + $slideTransition) * $i;
+            $slideIsVideo = $slide['type'] === 'video';
+            $slideStyle   = 'animation-delay:' . $delay . 's;animation-duration:' . $cycleTime . 's;';
+            if (!$slideIsVideo) {
+                $slideStyle .= 'background-image:url(' . htmlspecialchars($slide['url'], ENT_QUOTES, 'UTF-8') . ');';
+            }
     ?>
     <div
         class="mod-moko-hero__slide<?php echo $slideIsVideo ? ' mod-moko-hero__slide--video' : ''; ?>"
         style="<?php echo $slideStyle; ?>"
         aria-hidden="true"
-    >
-        <?php if ($slideIsVideo) : ?>
-        <video
+    ><?php if ($slideIsVideo) : ?><video
             class="mod-moko-hero__video"
-            autoplay
-            muted
-            loop
-            playsinline
-            aria-hidden="true"
-            tabindex="-1"
-        >
-            <source
-                src="<?php echo htmlspecialchars($slide['url'], ENT_QUOTES, 'UTF-8'); ?>"
-                type="<?php echo $slide['mime']; ?>"
-            >
-        </video>
-        <?php endif; ?>
-    </div>
-    <?php endforeach; ?>
+            autoplay muted loop playsinline
+            aria-hidden="true" tabindex="-1"
+        ><source src="<?php echo htmlspecialchars($slide['url'], ENT_QUOTES, 'UTF-8'); ?>" type="<?php echo $slide['mime']; ?>"></video><?php endif; ?></div>
+    <?php endforeach; endif; ?>
 
-    <?php elseif ($isVideo) : ?>
-    <!--
-        Single video background. autoplay + muted + loop + playsinline are the
-        four attributes required for cross-browser autoplay without a user gesture.
-    -->
+    <?php if ($isVideo && !$isSlideshow) : ?>
     <video
         class="mod-moko-hero__video"
-        autoplay
-        muted
-        loop
-        playsinline
-        aria-hidden="true"
-        tabindex="-1"
+        autoplay muted loop playsinline
+        aria-hidden="true" tabindex="-1"
     >
         <source
             src="<?php echo htmlspecialchars($mediaUrl, ENT_QUOTES, 'UTF-8'); ?>"
             type="<?php
-                $ext = strtolower(pathinfo($mediaUrl, PATHINFO_EXTENSION));
-                $mimeMap = ['mp4'=>'video/mp4','webm'=>'video/webm','ogg'=>'video/ogg','ogv'=>'video/ogg'];
+                $ext     = strtolower(pathinfo($mediaUrl, PATHINFO_EXTENSION));
+                $mimeMap = ['mp4' => 'video/mp4', 'webm' => 'video/webm', 'ogg' => 'video/ogg', 'ogv' => 'video/ogg'];
                 echo $mimeMap[$ext] ?? 'video/mp4';
             ?>"
         >
@@ -154,31 +141,35 @@ $hasContent  = $heroTitle !== '' || $heroText !== '' || $link !== '';
     <?php endif; ?>
 
     <?php if ($hasContent) : ?>
-    <div class="mod-moko-hero__inner container">
-        <div class="mod-moko-hero__content">
+    <!--
+        .banner-overlay is the Cassiopeia-native class from the built-in
+        mod_custom banner template override. Reusing it here means Cassiopeia's
+        stylesheet rules for the overlay panel apply automatically.
+    -->
+    <div class="banner-overlay">
 
-            <?php if ($heroTitle !== '') : ?>
-            <h2 class="mod-moko-hero__title">
-                <?php echo htmlspecialchars($heroTitle, ENT_QUOTES, 'UTF-8'); ?>
-            </h2>
-            <?php endif; ?>
+        <?php if ($heroTitle !== '') : ?>
+        <h1 class="display-4 text-thin">
+            <?php echo htmlspecialchars($heroTitle, ENT_QUOTES, 'UTF-8'); ?>
+        </h1>
+        <?php endif; ?>
 
-            <?php if ($heroText !== '') : ?>
-            <div class="mod-moko-hero__text">
-                <?php echo $heroText; ?>
-            </div>
-            <?php endif; ?>
+        <?php if ($heroText !== '') : ?>
+        <div class="lead">
+            <?php echo $heroText; ?>
+        </div>
+        <?php endif; ?>
 
-            <?php if ($link !== '') : ?>
+        <?php if ($link !== '') : ?>
+        <p>
             <a
                 href="<?php echo htmlspecialchars($link, ENT_QUOTES, 'UTF-8'); ?>"
-                class="mod-moko-hero__cta btn btn-primary btn-lg"
-            >
-                <?php echo htmlspecialchars($linkText, ENT_QUOTES, 'UTF-8'); ?>
-            </a>
-            <?php endif; ?>
+                class="btn btn-primary btn-lg"
+            ><?php echo htmlspecialchars($linkText, ENT_QUOTES, 'UTF-8'); ?></a>
+        </p>
+        <?php endif; ?>
 
-        </div>
     </div>
     <?php endif; ?>
+
 </div>

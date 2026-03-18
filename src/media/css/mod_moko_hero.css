@@ -1,17 +1,27 @@
 /**
- * mod_moko_hero — Hero background-image overlay module
+ * mod_moko_hero — Hero background-image/video/slideshow module
  *
- * Mirrors the visual pattern of Cassiopeia's mod_custom "banner" template
- * override: a full-width block with a background image, a semi-transparent
- * colour overlay via ::before, and centred content stacked above it.
+ * Built on top of Cassiopeia's native .container-banner / .banner-overlay
+ * class pair (used by the mod_custom "banner" template override), so
+ * Cassiopeia's own rules for those selectors apply automatically.
  *
- * All configurable values arrive as CSS custom properties set inline on the
- * root element by default.php, so this file contains zero hard-coded values
- * for things the site administrator controls.
+ * This file adds only what Cassiopeia does not already provide:
+ *  - configurable height, background image, and overlay colour/opacity
+ *    via CSS custom properties injected inline by default.php
+ *  - absolutely-positioned <video> background support
+ *  - pure-CSS crossfade slideshow via @keyframes
+ *  - prefers-reduced-motion accommodations
+ *
+ * Selector strategy
+ * -----------------
+ * .container-banner.mod-moko-hero   — outer wrapper (bg image / video layer)
+ * .banner-overlay                   — Cassiopeia-native content panel
+ * .mod-moko-hero__slide             — slideshow slide layer
+ * .mod-moko-hero__video             — <video> element (single or per-slide)
  */
 
-/* ── Container ──────────────────────────────────────────────────────────────── */
-.mod-moko-hero {
+/* ── Container (.container-banner is the Cassiopeia wrapper) ────────────────── */
+.container-banner.mod-moko-hero {
     position: relative;
     display: flex;
     align-items: center;
@@ -20,121 +30,73 @@
     min-height: var(--moko-hero-height, 70vh);
     overflow: hidden;
 
-    /* Background image — falls back to transparent when no image is resolved */
     background-image: var(--moko-hero-bg-image, none);
     background-size: cover;
     background-position: var(--moko-hero-bg-position, center center);
     background-repeat: no-repeat;
 
-    /* Solid-colour fallback visible when no image is present */
+    /* Fallback colour when no media is found */
     background-color: #1a1a2e;
 }
 
-/* ── Overlay ────────────────────────────────────────────────────────────────── */
+/* ── Colour overlay via ::before ────────────────────────────────────────────── */
 /*
- * Pseudo-element overlay pattern from Cassiopeia's banner layout.
- * Using ::before keeps the overlay out of the accessibility tree and allows
- * z-index layering without extra DOM nodes.
+ * Matches Cassiopeia's banner override pattern: the overlay is a pseudo-
+ * element, keeping it out of the accessibility tree and allowing clean
+ * z-index stacking without extra DOM nodes.
  */
-.mod-moko-hero::before {
+.container-banner.mod-moko-hero::before {
     content: "";
     position: absolute;
-    inset: 0;                       /* shorthand for top/right/bottom/left: 0 */
+    inset: 0;
     background-color: var(--moko-hero-overlay-color, #000);
     opacity: var(--moko-hero-overlay-opacity, 0.45);
     pointer-events: none;
     z-index: 1;
 }
 
-/* ── Inner / content wrapper ────────────────────────────────────────────────── */
-.mod-moko-hero__inner {
+/* ── .banner-overlay content panel ─────────────────────────────────────────── */
+/*
+ * Cassiopeia's own stylesheet already centres and styles .banner-overlay.
+ * We only layer it above the ::before overlay and respect the colour/align
+ * CSS variables passed from the module params.
+ */
+.container-banner.mod-moko-hero .banner-overlay {
     position: relative;
-    z-index: 2;                     /* sit above the ::before overlay */
+    z-index: 2;
+    color: var(--moko-hero-text-color, #fff);
+    text-align: var(--moko-hero-align, center);
     width: 100%;
     padding-block: 4rem;
 }
 
-.mod-moko-hero__content {
-    display: flex;
-    flex-direction: column;
-    align-items: var(--moko-hero-align, center);
-    text-align: var(--moko-hero-align, center);
-    color: var(--moko-hero-text-color, #fff);
-    max-width: 800px;
-
-    /* Centre the content block when alignment is "center" */
-    margin-inline: auto;
-}
-
-/* Left-aligned variant */
-.mod-moko-hero[style*="flex-start"] .mod-moko-hero__content {
-    margin-inline: 0;
-}
-
-/* Right-aligned variant */
-.mod-moko-hero[style*="flex-end"] .mod-moko-hero__content {
-    margin-inline: 0 0;
-    margin-inline-start: auto;
-}
-
-/* ── Typography ─────────────────────────────────────────────────────────────── */
-.mod-moko-hero__title {
-    font-size: clamp(1.75rem, 5vw, 3.5rem);
-    font-weight: 700;
-    line-height: 1.15;
-    margin-block-end: 1rem;
+/* Ensure child typography inherits the configured text colour */
+.container-banner.mod-moko-hero .banner-overlay h1,
+.container-banner.mod-moko-hero .banner-overlay .lead,
+.container-banner.mod-moko-hero .banner-overlay p {
     color: inherit;
+}
+
+.container-banner.mod-moko-hero .banner-overlay h1 {
     text-shadow: 0 2px 8px rgba(0, 0, 0, .35);
-}
-
-.mod-moko-hero__text {
-    font-size: clamp(1rem, 2vw, 1.25rem);
-    line-height: 1.6;
-    margin-block-end: 2rem;
-    color: inherit;
-    opacity: .9;
-}
-
-.mod-moko-hero__text p:last-child {
-    margin-block-end: 0;
-}
-
-/* ── CTA button ─────────────────────────────────────────────────────────────── */
-.mod-moko-hero__cta {
-    align-self: var(--moko-hero-align, center);
-    /* Inherits Bootstrap/Cassiopeia .btn .btn-primary .btn-lg — no overrides needed */
 }
 
 /* ── Slideshow ──────────────────────────────────────────────────────────────── */
 /*
  * Pure-CSS crossfade slideshow — no JavaScript required.
  *
- * Each .mod-moko-hero__slide is absolutely stacked and starts hidden (opacity:0).
- * The @keyframes below fades a slide in, holds it for the configured duration,
- * then fades it out. Per-slide animation-delay is calculated in PHP based on
- * slide index × (duration + transition), so slides cycle in sequence.
+ * Each .mod-moko-hero__slide is absolutely stacked below the overlay
+ * (z-index 0) and starts hidden (opacity: 0).  The @keyframes fades each
+ * slide in, holds it, then fades it out.  Per-slide animation-delay is
+ * calculated in PHP as: index × (duration + transition), so slides cycle in
+ * sequence. animation-duration is set to the full cycle length so the loop
+ * is seamless.
  *
- * The total animation-duration equals: (duration + transition) × slideCount
- * — set inline on each slide so the cycle loops seamlessly.
- *
- * CSS custom properties used:
- *   --moko-slideshow-transition  fade in/out duration
- *   --moko-slideshow-duration    how long each slide is fully visible
- *   --moko-slideshow-cycle       full cycle length (computed in PHP)
- *
- * Percentages in @keyframes below assume the following shape per cycle:
- *   0%           → start of fade-in
- *   transition%  → fully visible (after fade-in)
- *   (transition+duration)/cycle × 100%  → begin fade-out
- *   (2×transition+duration)/cycle × 100% → fully hidden for remainder
- *
- * Because the cycle length varies per module instance we cannot hard-code
- * percentages here. Instead we use a simplified "show briefly, stay hidden"
- * keyframe and rely on animation-fill-mode: backwards so the first slide is
- * visible on load before any transitions begin.
+ *   z-index stack (bottom → top):
+ *   0  .mod-moko-hero__slide  (bg layers)
+ *   1  .mod-moko-hero::before (colour overlay)
+ *   2  .banner-overlay        (text content)
  */
-
-/* Slide container — stacked full-bleed layer */
 .mod-moko-hero__slide {
     position: absolute;
     inset: 0;
@@ -150,41 +112,30 @@
 }
 
 /*
- * Keyframe breakdown (per slide, within its own duration):
- *   0%              → invisible (just started or returning after full cycle)
- *   5%              → fade in begins
- *   20%             → fully visible, hold
- *   80%             → begin fade out
- *   95%             → invisible
- *   100%            → invisible (loop back)
- *
- * The 5/20/80/95 stops are chosen to give a fast fade-in (~5% of cycle),
- * a long visible hold (~60%), and a fast fade-out (~15%), which looks natural
- * for a 3–8 second slide interval.
+ * Keyframe shape (per cycle):
+ *   0–5%    fade in
+ *   5–80%   fully visible
+ *   80–95%  fade out
+ *   95–100% invisible (wait for next cycle)
  */
 @keyframes mokoHeroFade {
     0%   { opacity: 0; }
     5%   { opacity: 1; }
-    20%  { opacity: 1; }
     80%  { opacity: 1; }
     95%  { opacity: 0; }
     100% { opacity: 0; }
 }
 
-/* Video slide variant — reset background-image (the video element fills it) */
+/* Video slides reset background-image (the <video> element fills the frame) */
 .mod-moko-hero__slide--video {
     background-image: none !important; /* stylelint-disable-line declaration-no-important */
 }
 
 /* ── Video background ───────────────────────────────────────────────────────── */
 /*
- * The <video> element is absolutely positioned to fill the container,
- * exactly as a CSS background-image would. object-fit: cover + object-position
- * mirrors background-size: cover + background-position so the two media types
- * look visually identical from the administrator's perspective.
- *
- * z-index 0 places the video below the ::before overlay (z-index 1) and
- * the content wrapper (z-index 2).
+ * Absolutely-positioned <video> fills the container the same way a CSS
+ * background-image does. object-fit: cover mirrors background-size: cover.
+ * z-index 0 keeps video below the ::before overlay (z-index 1).
  */
 .mod-moko-hero__video {
     position: absolute;
@@ -197,32 +148,23 @@
     pointer-events: none;
 }
 
-/*
- * When a video is the background, suppress the CSS background-image slot
- * so no unwanted colour bleed appears behind the video element.
- */
-.mod-moko-hero--video {
+/* Suppress CSS background-image slot when a video element fills the frame */
+.container-banner.mod-moko-hero--video {
     background-image: none;
 }
 
 /* ── No-media fallback ──────────────────────────────────────────────────────── */
-.mod-moko-hero--no-media {
-    /* Retain the overlay layer so the gradient fallback still looks intentional */
+.container-banner.mod-moko-hero--no-media {
     background-image: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
 }
 
 /* ── Reduced-motion preference ──────────────────────────────────────────────── */
-/*
- * Users who prefer reduced motion should not see autoplaying video.
- * Pause the video via the hidden attribute workaround is not reliable in CSS;
- * instead we hide the video and show the no-media gradient fallback.
- */
 @media (prefers-reduced-motion: reduce) {
-    .mod-moko-hero {
+    .container-banner.mod-moko-hero {
         background-attachment: scroll;
     }
 
-    /* Stop all slide animations — show only the first slide statically */
+    /* Stop slideshow — freeze on first slide */
     .mod-moko-hero__slide {
         animation: none;
         opacity: 0;
@@ -232,12 +174,12 @@
         opacity: 1;
     }
 
-    /* Hide autoplaying video in slideshow and single-video modes */
+    /* Hide autoplaying video; show gradient fallback instead */
     .mod-moko-hero__video {
         display: none;
     }
 
-    .mod-moko-hero--video,
+    .container-banner.mod-moko-hero--video,
     .mod-moko-hero__slide--video:first-child {
         background-image: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
     }
@@ -245,7 +187,7 @@
 
 /* ── Responsive adjustments ─────────────────────────────────────────────────── */
 @media (max-width: 767.98px) {
-    .mod-moko-hero__inner {
+    .container-banner.mod-moko-hero .banner-overlay {
         padding-block: 2.5rem;
     }
 }
