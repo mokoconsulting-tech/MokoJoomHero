@@ -11,7 +11,7 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Helper\ModuleHelper;
-use MokoConsulting\Module\MokoHero\Site\Helper\MokoHeroHelper;
+use MokoConsulting\Module\MokoHero\Helper\MokoHeroHelper;
 
 /** @var \Joomla\CMS\Application\SiteApplication $app */
 /** @var \Joomla\Registry\Registry $params */

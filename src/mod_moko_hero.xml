@@ -11,15 +11,15 @@
     <description>MOD_MOKO_HERO_XML_DESCRIPTION</description>
 
     <!--
-        namespace path points at src/ which is now the module root itself.
-        Joomla resolves namespaces relative to the extension root, so
-        src/Helper/MokoHeroHelper.php → MokoConsulting\Module\MokoHero\Site\Helper\MokoHeroHelper
+        path="" means the PSR-4 root is the module directory itself.
+        MokoConsulting\Module\MokoHero\Helper\MokoHeroHelper
+          → modules/mod_moko_hero/Helper/MokoHeroHelper.php
     -->
-    <namespace path="src">MokoConsulting\Module\MokoHero</namespace>
+    <namespace path="">MokoConsulting\Module\MokoHero</namespace>
 
     <files>
         <filename module="mod_moko_hero">mod_moko_hero.php</filename>
-        <folder>src</folder>
+        <folder>Helper</folder>
         <folder>tmpl</folder>
         <folder>media</folder>
     </files>
