@@ -19,7 +19,7 @@
 
     <files>
         <filename module="mod_moko_hero">mod_moko_hero.php</filename>
-        <folder>Site</folder>
+        <folder>src</folder>
         <folder>tmpl</folder>
         <folder>media</folder>
     </files>
