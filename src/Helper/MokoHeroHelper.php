@@ -19,41 +19,45 @@ use Joomla\Registry\Registry;
 /**
  * Helper for mod_moko_hero
  *
- * Scans a folder for supported image files and returns a URL to a randomly
- * selected image — mirroring the approach used by Joomla's own mod_random_image.
+ * Scans a folder for supported image and video files and returns a URL and
+ * media type for a randomly selected file — mirroring the approach used by
+ * Joomla's own mod_random_image while adding video background support.
  */
 class MokoHeroHelper
 {
-    /**
-     * Supported image extensions (matches mod_random_image defaults).
-     */
-    private const SUPPORTED_TYPES = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
+    /** Image extensions rendered via CSS background-image. */
+    private const IMAGE_TYPES = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
 
     /**
-     * Return a root-relative URL for a random image found in the configured folder.
+     * Video extensions rendered via an HTML <video> element.
+     * mp4 (H.264) has near-universal browser support; webm (VP9/AV1) is the
+     * open alternative. ogg/ogv is kept for legacy completeness.
+     */
+    private const VIDEO_TYPES = ['mp4', 'webm', 'ogg', 'ogv'];
+
+    /**
+     * Resolve a random media file from the configured folder.
      *
-     * Returns an empty string when the folder is empty or inaccessible so that
-     * the template can degrade gracefully (e.g. show a solid colour fallback).
+     * Returns an array with two keys:
+     *   'url'  — root-relative URL string, or '' when nothing is found
+     *   'type' — 'image' | 'video' | ''
      *
      * @param   Registry  $params  Module parameters.
      *
-     * @return  string  Root-relative URL, e.g. "/images/headers/hero.jpg", or empty string.
+     * @return  array{url: string, type: string}
      */
-    public static function getRandomImageUrl(Registry $params): string
+    public static function getRandomMedia(Registry $params): array
     {
         // The folderlist field stores only the subfolder name (e.g. "headers"),
         // relative to its `directory` attribute ("images"). Reconstruct the full
-        // site-root-relative path so we can resolve both the filesystem path and
-        // the public URL consistently.
+        // site-root-relative path for filesystem resolution and public URL.
         $subfolder = trim((string) $params->get('folder', 'headers'), '/\\ ');
 
         if ($subfolder === '') {
-            return '';
+            return ['url' => '', 'type' => ''];
         }
 
         $folder   = 'images/' . $subfolder;
-
-        // Build the absolute filesystem path relative to the Joomla root.
         $basePath = JPATH_SITE . '/' . $folder;
 
         if (!is_dir($basePath)) {
@@ -62,31 +66,34 @@ class MokoHeroHelper
                 'warning'
             );
 
-            return '';
+            return ['url' => '', 'type' => ''];
         }
 
-        $images = self::scanFolder($basePath);
+        $files = self::scanFolder($basePath);
 
-        if (empty($images)) {
-            return '';
+        if (empty($files)) {
+            return ['url' => '', 'type' => ''];
         }
 
-        $chosen = $images[array_rand($images)];
+        $chosen   = $files[array_rand($files)];
+        $ext      = strtolower(pathinfo($chosen, PATHINFO_EXTENSION));
+        $mediaType = in_array($ext, self::VIDEO_TYPES, true) ? 'video' : 'image';
+        $url      = Uri::root(true) . '/' . $folder . '/' . $chosen;
 
-        // Return a root-relative URL safe for use in CSS background-image.
-        return Uri::root(true) . '/' . $folder . '/' . $chosen;
+        return ['url' => $url, 'type' => $mediaType];
     }
 
     /**
-     * Scan a directory and return filenames that match supported image types.
+     * Scan a directory and return filenames matching image or video types.
      *
      * @param   string  $path  Absolute filesystem path.
      *
-     * @return  string[]  Flat array of filenames (no path prefix).
+     * @return  string[]
      */
     private static function scanFolder(string $path): array
     {
-        $images = [];
+        $supported = array_merge(self::IMAGE_TYPES, self::VIDEO_TYPES);
+        $files     = [];
 
         try {
             $iterator = new \DirectoryIterator($path);
@@ -99,13 +106,11 @@ class MokoHeroHelper
                 continue;
             }
 
-            $ext = strtolower($file->getExtension());
-
-            if (in_array($ext, self::SUPPORTED_TYPES, true)) {
-                $images[] = $file->getFilename();
+            if (in_array(strtolower($file->getExtension()), $supported, true)) {
+                $files[] = $file->getFilename();
             }
         }
 
-        return $images;
+        return $files;
     }
 }

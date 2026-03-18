@@ -918,3 +918,8 @@ htdocs/logs/
 # Keep-empty folders helper
 # ============================================================
 !.gitkeep
+
+# ============================================================
+# Claude Code local settings (machine-specific, never commit)
+# ============================================================
+.claude/settings.local.json

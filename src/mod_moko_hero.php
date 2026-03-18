@@ -16,8 +16,10 @@ use MokoConsulting\Module\MokoHero\Site\Helper\MokoHeroHelper;
 /** @var \Joomla\CMS\Application\SiteApplication $app */
 /** @var \Joomla\Registry\Registry $params */
 
-// Resolve a random image from the configured folder
-$imageUrl = MokoHeroHelper::getRandomImageUrl($params);
+// Resolve a random image or video from the configured folder.
+// Returns ['url' => string, 'type' => 'image'|'video'|'']
+$media     = MokoHeroHelper::getRandomMedia($params);
+$mediaUrl  = $media['url'];
+$mediaType = $media['type'];
 
-// Only render if we have an image (or if the module has text content)
 require ModuleHelper::getLayoutPath('mod_moko_hero', $params->get('layout', 'default'));
