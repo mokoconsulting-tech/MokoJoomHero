@@ -101,6 +101,41 @@
             <fieldset name="display" label="MOD_MOKO_HERO_FIELDSET_DISPLAY">
 
                 <field
+                    name="display_mode"
+                    type="list"
+                    label="MOD_MOKO_HERO_FIELD_DISPLAY_MODE_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_DISPLAY_MODE_DESC"
+                    default="random"
+                >
+                    <option value="random">MOD_MOKO_HERO_DISPLAY_MODE_RANDOM</option>
+                    <option value="slideshow">MOD_MOKO_HERO_DISPLAY_MODE_SLIDESHOW</option>
+                </field>
+
+                <field
+                    name="slide_duration"
+                    type="number"
+                    label="MOD_MOKO_HERO_FIELD_SLIDE_DURATION_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_SLIDE_DURATION_DESC"
+                    default="5"
+                    min="2"
+                    max="30"
+                    step="1"
+                    showon="display_mode:slideshow"
+                />
+
+                <field
+                    name="slide_transition"
+                    type="number"
+                    label="MOD_MOKO_HERO_FIELD_SLIDE_TRANSITION_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_SLIDE_TRANSITION_DESC"
+                    default="1"
+                    min="0.5"
+                    max="5"
+                    step="0.5"
+                    showon="display_mode:slideshow"
+                />
+
+                <field
                     name="height"
                     type="text"
                     label="MOD_MOKO_HERO_FIELD_HEIGHT_LABEL"

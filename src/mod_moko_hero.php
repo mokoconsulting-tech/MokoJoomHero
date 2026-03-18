@@ -16,10 +16,19 @@ use MokoConsulting\Module\MokoHero\Site\Helper\MokoHeroHelper;
 /** @var \Joomla\CMS\Application\SiteApplication $app */
 /** @var \Joomla\Registry\Registry $params */
 
-// Resolve a random image or video from the configured folder.
-// Returns ['url' => string, 'type' => 'image'|'video'|'']
-$media     = MokoHeroHelper::getRandomMedia($params);
-$mediaUrl  = $media['url'];
-$mediaType = $media['type'];
+$displayMode = $params->get('display_mode', 'random');
+
+if ($displayMode === 'slideshow') {
+    // Slideshow: pass the full list of media items to the template.
+    $slides    = MokoHeroHelper::getAllMedia($params);
+    $mediaUrl  = '';
+    $mediaType = '';
+} else {
+    // Random: pick a single item.
+    $slides    = [];
+    $media     = MokoHeroHelper::getRandomMedia($params);
+    $mediaUrl  = $media['url']  ?? '';
+    $mediaType = $media['type'] ?? '';
+}
 
 require ModuleHelper::getLayoutPath('mod_moko_hero', $params->get('layout', 'default'));

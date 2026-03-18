@@ -19,42 +19,49 @@ use Joomla\Registry\Registry;
 /**
  * Helper for mod_moko_hero
  *
- * Scans a folder for supported image and video files and returns a URL and
- * media type for a randomly selected file — mirroring the approach used by
- * Joomla's own mod_random_image while adding video background support.
+ * Scans a folder for supported image and video files.
+ * Returns either a single random item (random mode) or the full list
+ * with resolved URLs (slideshow mode).
  */
 class MokoHeroHelper
 {
-    /** Image extensions rendered via CSS background-image. */
+    /** Image extensions — rendered via CSS background-image. */
     private const IMAGE_TYPES = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
 
     /**
-     * Video extensions rendered via an HTML <video> element.
+     * Video extensions — rendered via an HTML <video> element.
      * mp4 (H.264) has near-universal browser support; webm (VP9/AV1) is the
-     * open alternative. ogg/ogv is kept for legacy completeness.
+     * open-codec alternative. ogg/ogv retained for legacy completeness.
      */
     private const VIDEO_TYPES = ['mp4', 'webm', 'ogg', 'ogv'];
 
+    /** MIME type map for <video> source elements. */
+    private const VIDEO_MIME = [
+        'mp4'  => 'video/mp4',
+        'webm' => 'video/webm',
+        'ogg'  => 'video/ogg',
+        'ogv'  => 'video/ogg',
+    ];
+
     /**
-     * Resolve a random media file from the configured folder.
+     * Return all media items from the configured folder as an array of
+     * ['url' => string, 'type' => 'image'|'video', 'mime' => string] maps.
      *
-     * Returns an array with two keys:
-     *   'url'  — root-relative URL string, or '' when nothing is found
-     *   'type' — 'image' | 'video' | ''
+     * The caller decides whether to use the full list (slideshow) or pick one
+     * at random (single-image mode).  Returns an empty array on error.
      *
      * @param   Registry  $params  Module parameters.
      *
-     * @return  array{url: string, type: string}
+     * @return  array<int, array{url: string, type: string, mime: string}>
      */
-    public static function getRandomMedia(Registry $params): array
+    public static function getAllMedia(Registry $params): array
     {
-        // The folderlist field stores only the subfolder name (e.g. "headers"),
-        // relative to its `directory` attribute ("images"). Reconstruct the full
-        // site-root-relative path for filesystem resolution and public URL.
+        // folderlist field stores only the subfolder name (e.g. "headers"),
+        // relative to its `directory` attribute ("images").
         $subfolder = trim((string) $params->get('folder', 'headers'), '/\\ ');
 
         if ($subfolder === '') {
-            return ['url' => '', 'type' => ''];
+            return [];
         }
 
         $folder   = 'images/' . $subfolder;
@@ -66,25 +73,53 @@ class MokoHeroHelper
                 'warning'
             );
 
-            return ['url' => '', 'type' => ''];
+            return [];
         }
 
-        $files = self::scanFolder($basePath);
+        $filenames = self::scanFolder($basePath);
 
-        if (empty($files)) {
-            return ['url' => '', 'type' => ''];
+        if (empty($filenames)) {
+            return [];
         }
 
-        $chosen   = $files[array_rand($files)];
-        $ext      = strtolower(pathinfo($chosen, PATHINFO_EXTENSION));
-        $mediaType = in_array($ext, self::VIDEO_TYPES, true) ? 'video' : 'image';
-        $url      = Uri::root(true) . '/' . $folder . '/' . $chosen;
+        $base = Uri::root(true) . '/' . $folder . '/';
+        $items = [];
 
-        return ['url' => $url, 'type' => $mediaType];
+        foreach ($filenames as $filename) {
+            $ext  = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+            $type = in_array($ext, self::VIDEO_TYPES, true) ? 'video' : 'image';
+            $mime = $type === 'video' ? (self::VIDEO_MIME[$ext] ?? 'video/mp4') : '';
+
+            $items[] = [
+                'url'  => $base . $filename,
+                'type' => $type,
+                'mime' => $mime,
+            ];
+        }
+
+        return $items;
     }
 
     /**
-     * Scan a directory and return filenames matching image or video types.
+     * Convenience wrapper: return a single random media item or an empty array.
+     *
+     * @param   Registry  $params  Module parameters.
+     *
+     * @return  array{url: string, type: string, mime: string}|array{}
+     */
+    public static function getRandomMedia(Registry $params): array
+    {
+        $all = self::getAllMedia($params);
+
+        if (empty($all)) {
+            return [];
+        }
+
+        return $all[array_rand($all)];
+    }
+
+    /**
+     * Scan a directory and return filenames that match supported image/video types.
      *
      * @param   string  $path  Absolute filesystem path.
      *

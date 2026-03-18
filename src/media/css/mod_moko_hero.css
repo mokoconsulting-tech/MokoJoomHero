@@ -105,6 +105,77 @@
     /* Inherits Bootstrap/Cassiopeia .btn .btn-primary .btn-lg — no overrides needed */
 }
 
+/* ── Slideshow ──────────────────────────────────────────────────────────────── */
+/*
+ * Pure-CSS crossfade slideshow — no JavaScript required.
+ *
+ * Each .mod-moko-hero__slide is absolutely stacked and starts hidden (opacity:0).
+ * The @keyframes below fades a slide in, holds it for the configured duration,
+ * then fades it out. Per-slide animation-delay is calculated in PHP based on
+ * slide index × (duration + transition), so slides cycle in sequence.
+ *
+ * The total animation-duration equals: (duration + transition) × slideCount
+ * — set inline on each slide so the cycle loops seamlessly.
+ *
+ * CSS custom properties used:
+ *   --moko-slideshow-transition  fade in/out duration
+ *   --moko-slideshow-duration    how long each slide is fully visible
+ *   --moko-slideshow-cycle       full cycle length (computed in PHP)
+ *
+ * Percentages in @keyframes below assume the following shape per cycle:
+ *   0%           → start of fade-in
+ *   transition%  → fully visible (after fade-in)
+ *   (transition+duration)/cycle × 100%  → begin fade-out
+ *   (2×transition+duration)/cycle × 100% → fully hidden for remainder
+ *
+ * Because the cycle length varies per module instance we cannot hard-code
+ * percentages here. Instead we use a simplified "show briefly, stay hidden"
+ * keyframe and rely on animation-fill-mode: backwards so the first slide is
+ * visible on load before any transitions begin.
+ */
+
+/* Slide container — stacked full-bleed layer */
+.mod-moko-hero__slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: var(--moko-hero-bg-position, center center);
+    background-repeat: no-repeat;
+    opacity: 0;
+    animation-name: mokoHeroFade;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-fill-mode: backwards;
+    z-index: 0;
+}
+
+/*
+ * Keyframe breakdown (per slide, within its own duration):
+ *   0%              → invisible (just started or returning after full cycle)
+ *   5%              → fade in begins
+ *   20%             → fully visible, hold
+ *   80%             → begin fade out
+ *   95%             → invisible
+ *   100%            → invisible (loop back)
+ *
+ * The 5/20/80/95 stops are chosen to give a fast fade-in (~5% of cycle),
+ * a long visible hold (~60%), and a fast fade-out (~15%), which looks natural
+ * for a 3–8 second slide interval.
+ */
+@keyframes mokoHeroFade {
+    0%   { opacity: 0; }
+    5%   { opacity: 1; }
+    20%  { opacity: 1; }
+    80%  { opacity: 1; }
+    95%  { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+/* Video slide variant — reset background-image (the video element fills it) */
+.mod-moko-hero__slide--video {
+    background-image: none !important; /* stylelint-disable-line declaration-no-important */
+}
+
 /* ── Video background ───────────────────────────────────────────────────────── */
 /*
  * The <video> element is absolutely positioned to fill the container,
@@ -151,11 +222,23 @@
         background-attachment: scroll;
     }
 
+    /* Stop all slide animations — show only the first slide statically */
+    .mod-moko-hero__slide {
+        animation: none;
+        opacity: 0;
+    }
+
+    .mod-moko-hero__slide:first-child {
+        opacity: 1;
+    }
+
+    /* Hide autoplaying video in slideshow and single-video modes */
     .mod-moko-hero__video {
         display: none;
     }
 
-    .mod-moko-hero--video {
+    .mod-moko-hero--video,
+    .mod-moko-hero__slide--video:first-child {
         background-image: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
     }
 }

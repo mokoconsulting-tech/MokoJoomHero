@@ -13,38 +13,44 @@ defined('_JEXEC') or die;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 
-/** @var \Joomla\Registry\Registry $params */
-/** @var string $mediaUrl   Root-relative URL to the selected image or video, or '' */
-/** @var string $mediaType  'image' | 'video' | '' */
+/**
+ * Variables provided by mod_moko_hero.php:
+ * @var \Joomla\Registry\Registry $params
+ * @var string  $displayMode  'random' | 'slideshow'
+ * @var string  $mediaUrl     Root-relative URL (random mode) or '' (slideshow mode)
+ * @var string  $mediaType    'image' | 'video' | ''
+ * @var array   $slides       Full media list (slideshow mode) or []
+ */
 
-// Load module stylesheet
 HTMLHelper::_('stylesheet', 'mod_moko_hero/mod_moko_hero.css', ['version' => 'auto', 'relative' => true]);
 
 // ── Parameters ────────────────────────────────────────────────────────────────
-$moduleId       = 'mod-moko-hero-' . $module->id;
-$heroTitle      = $params->get('hero_title', '');
-$heroText       = $params->get('hero_text', '');
-$link           = trim((string) $params->get('link', ''));
-$linkText       = $params->get('link_text', Text::_('MOD_MOKO_HERO_LEARN_MORE'));
-$height         = $params->get('height', '70vh');
-$overlayOpacity = (float) $params->get('overlay_opacity', 0.45);
-$overlayColor   = $params->get('overlay_color', '#000000');
-$contentAlign   = $params->get('content_align', 'center');
-$textColor      = $params->get('text_color', '#ffffff');
-$bgPosition     = $params->get('bg_position', 'center center');
+$moduleId        = 'mod-moko-hero-' . $module->id;
+$heroTitle       = $params->get('hero_title', '');
+$heroText        = $params->get('hero_text', '');
+$link            = trim((string) $params->get('link', ''));
+$linkText        = $params->get('link_text', Text::_('MOD_MOKO_HERO_LEARN_MORE'));
+$height          = $params->get('height', '70vh');
+$overlayOpacity  = (float) $params->get('overlay_opacity', 0.45);
+$overlayColor    = $params->get('overlay_color', '#000000');
+$contentAlign    = $params->get('content_align', 'center');
+$textColor       = $params->get('text_color', '#ffffff');
+$bgPosition      = $params->get('bg_position', 'center center');
+$slideDuration   = (int) $params->get('slide_duration', 5);
+$slideTransition = (float) $params->get('slide_transition', 1.0);
 
-$isImage = $mediaType === 'image';
-$isVideo = $mediaType === 'video';
-$hasMedia = $mediaUrl !== '';
+$isSlideshow = $displayMode === 'slideshow';
+$isImage     = $mediaType === 'image';
+$isVideo     = $mediaType === 'video';
+$hasMedia    = $mediaUrl !== '' || !empty($slides);
 
 // ── CSS modifier classes ───────────────────────────────────────────────────────
-$modifierClasses = [];
-if (!$hasMedia)  { $modifierClasses[] = 'mod-moko-hero--no-media'; }
-if ($isVideo)    { $modifierClasses[] = 'mod-moko-hero--video'; }
+$modClasses = ['mod-moko-hero'];
+if (!$hasMedia)  { $modClasses[] = 'mod-moko-hero--no-media'; }
+if ($isVideo)    { $modClasses[] = 'mod-moko-hero--video'; }
+if ($isSlideshow){ $modClasses[] = 'mod-moko-hero--slideshow'; }
 
 // ── Inline CSS custom properties ───────────────────────────────────────────────
-// All configurable visual values travel as CSS variables so the stylesheet
-// contains zero hard-coded values for administrator-controlled settings.
 $cssVars = [
     '--moko-hero-height:'          . htmlspecialchars($height,       ENT_QUOTES, 'UTF-8'),
     '--moko-hero-overlay-opacity:' . $overlayOpacity,
@@ -54,38 +60,78 @@ $cssVars = [
     '--moko-hero-bg-position:'     . htmlspecialchars($bgPosition,   ENT_QUOTES, 'UTF-8'),
 ];
 
-// Only set the background-image variable for images; videos are DOM elements.
 if ($isImage) {
+    // Single image: set as CSS background-image variable
     $cssVars[] = '--moko-hero-bg-image:url(' . htmlspecialchars($mediaUrl, ENT_QUOTES, 'UTF-8') . ')';
 }
 
-$inlineStyle = implode(';', $cssVars);
-
-$hasContent = $heroTitle !== '' || $heroText !== '' || $link !== '';
-
-// Derive MIME type for the <video> source element
-$videoMime = '';
-if ($isVideo) {
-    $ext = strtolower(pathinfo($mediaUrl, PATHINFO_EXTENSION));
-    $mimeMap = ['mp4' => 'video/mp4', 'webm' => 'video/webm', 'ogg' => 'video/ogg', 'ogv' => 'video/ogg'];
-    $videoMime = $mimeMap[$ext] ?? 'video/mp4';
+if ($isSlideshow && !empty($slides)) {
+    $count = count($slides);
+    // Total cycle = each slide shown for $slideDuration + $slideTransition seconds
+    $cycleDuration = ($slideDuration + $slideTransition) * $count;
+    $cssVars[] = '--moko-slideshow-count:'      . $count;
+    $cssVars[] = '--moko-slideshow-duration:'   . $slideDuration . 's';
+    $cssVars[] = '--moko-slideshow-transition:' . $slideTransition . 's';
+    $cssVars[] = '--moko-slideshow-cycle:'      . $cycleDuration . 's';
 }
+
+$inlineStyle = implode(';', $cssVars);
+$hasContent  = $heroTitle !== '' || $heroText !== '' || $link !== '';
 ?>
 <div
     id="<?php echo $moduleId; ?>"
-    class="mod-moko-hero<?php echo $modifierClasses ? ' ' . implode(' ', $modifierClasses) : ''; ?>"
+    class="<?php echo implode(' ', $modClasses); ?>"
     style="<?php echo $inlineStyle; ?>"
     role="banner"
     aria-label="<?php echo $heroTitle !== '' ? htmlspecialchars($heroTitle, ENT_QUOTES, 'UTF-8') : Text::_('MOD_MOKO_HERO_ARIA_LABEL'); ?>"
 >
-    <?php if ($isVideo) : ?>
+
+    <?php if ($isSlideshow && !empty($slides)) : ?>
     <!--
-        Video background — uses an absolutely-positioned <video> element rather
-        than CSS background-image (which does not support video).
-        autoplay + muted + loop + playsinline are the four attributes required
-        for cross-browser autoplay without a user gesture.
-        aria-hidden removes the video from the accessibility tree as it is
-        purely decorative.
+        Slideshow: each slide is absolutely stacked. CSS @keyframes on
+        .mod-moko-hero__slide drives opacity crossfades. Per-slide
+        animation-delay is calculated inline so the timing auto-scales
+        to any number of images — no JavaScript required.
+    -->
+    <?php
+    $count           = count($slides);
+    $cycleTotalMs    = ($slideDuration + $slideTransition) * $count;
+    foreach ($slides as $i => $slide) :
+        $delaySeconds  = ($slideDuration + $slideTransition) * $i;
+        $slideIsVideo  = $slide['type'] === 'video';
+        $slideStyle    = 'animation-delay:' . $delaySeconds . 's;animation-duration:' . $cycleTotalMs . 's;';
+        if (!$slideIsVideo) {
+            $slideStyle .= 'background-image:url(' . htmlspecialchars($slide['url'], ENT_QUOTES, 'UTF-8') . ');';
+        }
+    ?>
+    <div
+        class="mod-moko-hero__slide<?php echo $slideIsVideo ? ' mod-moko-hero__slide--video' : ''; ?>"
+        style="<?php echo $slideStyle; ?>"
+        aria-hidden="true"
+    >
+        <?php if ($slideIsVideo) : ?>
+        <video
+            class="mod-moko-hero__video"
+            autoplay
+            muted
+            loop
+            playsinline
+            aria-hidden="true"
+            tabindex="-1"
+        >
+            <source
+                src="<?php echo htmlspecialchars($slide['url'], ENT_QUOTES, 'UTF-8'); ?>"
+                type="<?php echo $slide['mime']; ?>"
+            >
+        </video>
+        <?php endif; ?>
+    </div>
+    <?php endforeach; ?>
+
+    <?php elseif ($isVideo) : ?>
+    <!--
+        Single video background. autoplay + muted + loop + playsinline are the
+        four attributes required for cross-browser autoplay without a user gesture.
     -->
     <video
         class="mod-moko-hero__video"
@@ -98,7 +144,11 @@ if ($isVideo) {
     >
         <source
             src="<?php echo htmlspecialchars($mediaUrl, ENT_QUOTES, 'UTF-8'); ?>"
-            type="<?php echo $videoMime; ?>"
+            type="<?php
+                $ext = strtolower(pathinfo($mediaUrl, PATHINFO_EXTENSION));
+                $mimeMap = ['mp4'=>'video/mp4','webm'=>'video/webm','ogg'=>'video/ogg','ogv'=>'video/ogg'];
+                echo $mimeMap[$ext] ?? 'video/mp4';
+            ?>"
         >
     </video>
     <?php endif; ?>
