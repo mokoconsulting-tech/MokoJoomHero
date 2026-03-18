@@ -113,6 +113,7 @@
                     description="MOD_MOKO_HERO_FIELD_BTN_ICON_DESC"
                     default=""
                     hint="MOD_MOKO_HERO_FIELD_BTN_ICON_HINT"
+                    showon="btn1_label!:"
                 />
 
                 <field
@@ -122,6 +123,7 @@
                     description="MOD_MOKO_HERO_FIELD_BTN_URL_DESC"
                     default=""
                     filter="url"
+                    showon="btn1_label!:"
                 />
 
                 <field
@@ -130,6 +132,7 @@
                     label="MOD_MOKO_HERO_FIELD_BTN_STYLE_LABEL"
                     description="MOD_MOKO_HERO_FIELD_BTN_STYLE_DESC"
                     default="btn-primary"
+                    showon="btn1_label!:"
                 >
                     <option value="btn-primary">MOD_MOKO_HERO_BTN_STYLE_PRIMARY</option>
                     <option value="btn-secondary">MOD_MOKO_HERO_BTN_STYLE_SECONDARY</option>
@@ -156,6 +159,7 @@
                     description="MOD_MOKO_HERO_FIELD_BTN_ICON_DESC"
                     default=""
                     hint="MOD_MOKO_HERO_FIELD_BTN_ICON_HINT"
+                    showon="btn2_label!:"
                 />
 
                 <field
@@ -165,6 +169,7 @@
                     description="MOD_MOKO_HERO_FIELD_BTN_URL_DESC"
                     default=""
                     filter="url"
+                    showon="btn2_label!:"
                 />
 
                 <field
@@ -173,6 +178,7 @@
                     label="MOD_MOKO_HERO_FIELD_BTN_STYLE_LABEL"
                     description="MOD_MOKO_HERO_FIELD_BTN_STYLE_DESC"
                     default="btn-outline-light"
+                    showon="btn2_label!:"
                 >
                     <option value="btn-primary">MOD_MOKO_HERO_BTN_STYLE_PRIMARY</option>
                     <option value="btn-secondary">MOD_MOKO_HERO_BTN_STYLE_SECONDARY</option>
@@ -199,6 +205,7 @@
                     description="MOD_MOKO_HERO_FIELD_BTN_ICON_DESC"
                     default=""
                     hint="MOD_MOKO_HERO_FIELD_BTN_ICON_HINT"
+                    showon="btn3_label!:"
                 />
 
                 <field
@@ -208,12 +215,14 @@
                     description="MOD_MOKO_HERO_FIELD_BTN_URL_DESC"
                     default=""
                     filter="url"
+                    showon="btn3_label!:"
                 />
 
                 <field
                     name="btn3_style"
                     type="list"
                     label="MOD_MOKO_HERO_FIELD_BTN_STYLE_LABEL"
+                    showon="btn3_label!:"
                     description="MOD_MOKO_HERO_FIELD_BTN_STYLE_DESC"
                     default="btn-secondary"
                 >
