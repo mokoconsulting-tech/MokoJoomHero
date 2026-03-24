@@ -53,8 +53,6 @@ on:
       - develop
       - dev
       - development
-    paths:
-      - 'src/**'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
@@ -392,9 +390,7 @@ jobs:
           composer install --no-dev --no-interaction --quiet
 
       - name: Clear remote destination folder
-        if: >-
-          steps.source.outputs.skip == 'false' &&
-          inputs.clear_remote == true
+        if: steps.source.outputs.skip == 'false'
         env:
           SFTP_HOST:      ${{ steps.conn.outputs.host }}
           SFTP_PORT:      ${{ steps.conn.outputs.port }}
