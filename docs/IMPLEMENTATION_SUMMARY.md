@@ -1,165 +1,128 @@
-# Implementation Summary: License Download with Firewall Configuration
+# Implementation Summary: mod_moko_hero
 
 ## Overview
 
-This implementation adds automated GPL-3.0 license download functionality with comprehensive firewall configuration support for enterprise environments.
+`mod_moko_hero` is a Joomla 4/5 site module that renders a full-width hero section with a media background (images or video), configurable overlay, rich-text content layers, and call-to-action buttons. It supports both single random media selection and CSS-animated slideshow mode.
 
-## What Was Implemented
+## Architecture
 
-### 1. GitHub Actions Workflow (`.github/workflows/download-license.yml`)
+The module uses Joomla's native Dependency Injection (DI) module pattern — no legacy `mod_moko_hero.php` entry point.
 
-A comprehensive workflow that:
-- **Downloads GPL-3.0 license** from www.gnu.org automatically
-- **Tests firewall connectivity** before attempting download
-- **Validates license content** to ensure integrity
-- **Adds copyright header** with project information
-- **Commits and pushes** changes automatically
-- **Provides fallback sources** (ftp.gnu.org) if primary fails
-- **Includes detailed logging** and workflow summaries
+### Request Flow
 
-**Triggers:**
-- Manual dispatch (can be run on-demand)
-- Monthly schedule (1st of each month)
-- When workflow file is modified
-
-**Key Features:**
-- DNS resolution testing
-- HTTPS connectivity validation
-- License content verification (checks for GPL-3.0 markers)
-- Automatic retry with fallback source
-- Comprehensive error messages with troubleshooting steps
-
-### 2. Firewall Configuration Documentation (`docs/FIREWALL_CONFIGURATION.md`)
-
-Enterprise-ready documentation including:
-- **Required network access** specifications
-- **Firewall rule examples** for multiple platforms:
-  - iptables (Linux)
-  - UFW (Uncomplicated Firewall)
-  - firewalld (RHEL/CentOS/Fedora)
-  - Windows Firewall (PowerShell)
-  - AWS Security Groups
-  - Azure Network Security Groups
-  - Google Cloud Platform firewall rules
-- **Connectivity testing** procedures
-- **Troubleshooting guide** for common issues
-- **Proxy configuration** instructions
-- **Security considerations** and best practices
-
-### 3. Test Script (`scripts/test-firewall.sh`)
-
-A standalone testing utility that:
-- Validates DNS resolution for gnu.org domains
-- Tests HTTPS connectivity
-- Attempts actual license download
-- Provides clear pass/fail results
-- Includes detailed error messages and remediation steps
-
-### 4. Documentation Updates
-
-- **README.md**: Added section about automated license management with link to firewall docs
-- **.github/workflows/README.md**: Overview of available workflows and their requirements
-
-## Technical Details
-
-### Required Network Access
-
-**Primary Domain:**
-- Domain: `www.gnu.org`
-- Protocol: HTTPS (TCP)
-- Port: 443
-
-**Fallback Domain:**
-- Domain: `ftp.gnu.org`
-- Protocol: HTTPS (TCP)
-- Port: 443
-
-### Workflow Steps
-
-1. **Checkout repository** - Uses `actions/checkout@v4`
-2. **Configure firewall allowlist** - Tests connectivity and displays requirements
-3. **Download GPL-3.0 License** - Downloads from primary/fallback sources
-4. **Validate license file** - Checks content, size, and format
-5. **Add copyright header** - Prepends project copyright information
-6. **Check for changes** - Determines if commit is needed
-7. **Commit and push changes** - Automatically commits if license changed
-8. **Workflow summary** - Provides detailed summary in GitHub Actions UI
-
-### Security Features
-
-- **Minimal permissions**: Only `contents: write` required
-- **Input validation**: Verifies downloaded content before use
-- **Content verification**: Checks for GPL-3.0 markers in downloaded file
-- **Fallback sources**: Multiple trusted sources (www.gnu.org, ftp.gnu.org)
-- **Skip CI tag**: Prevents infinite workflow loops
-
-### Enterprise Considerations
-
-The implementation addresses enterprise requirements:
-
-1. **Firewall compatibility**: Clear documentation for various firewall types
-2. **Proxy support**: Instructions for corporate proxy configuration
-3. **Self-hosted runners**: Support for on-premise GitHub Actions runners
-4. **Troubleshooting**: Comprehensive guide for common enterprise network issues
-5. **Manual fallback**: Instructions for manual license management if automated download not possible
-
-## Files Created/Modified
-
-### Created:
-- `.github/workflows/download-license.yml` - Main workflow file
-- `.github/workflows/README.md` - Workflow documentation
-- `docs/FIREWALL_CONFIGURATION.md` - Firewall setup guide
-- `scripts/test-firewall.sh` - Connectivity test script
-
-### Modified:
-- `README.md` - Added automated license management section
-
-## Usage
-
-### For End Users
-
-Simply use the template repository. The workflow will:
-- Run automatically on the 1st of each month
-- Can be triggered manually from GitHub Actions tab
-- Downloads/updates the LICENSE file as needed
-
-### For Enterprise Environments
-
-1. Review firewall configuration requirements in `docs/FIREWALL_CONFIGURATION.md`
-2. Configure firewall rules to allow access to www.gnu.org:443
-3. Test connectivity using `scripts/test-firewall.sh`
-4. Enable the workflow in GitHub Actions
-
-### Manual Testing
-
-```bash
-# Test firewall connectivity
-./scripts/test-firewall.sh
-
-# Manually trigger workflow
-# Go to GitHub Actions → Download License → Run workflow
+```
+Joomla Module Renderer
+  └─ services/provider.php          registers ModuleDispatcherFactory + Module
+       └─ Dispatcher::getLayoutData()   resolves display mode, calls Helper
+            └─ MokoHeroHelper           scans folder, returns media items
+                 └─ tmpl/default.php    renders hero markup with CSS custom properties
 ```
 
-## Benefits
+### Key Files
 
-1. **Compliance**: Ensures GPL-3.0 license is always present and up-to-date
-2. **Automation**: No manual license management required
-3. **Enterprise-ready**: Comprehensive firewall documentation and support
-4. **Reliable**: Fallback sources and robust error handling
-5. **Transparent**: Clear logging and validation steps
-6. **Secure**: Minimal permissions and content verification
+| File | Purpose |
+|------|---------|
+| `services/provider.php` | DI service provider — registers `ModuleDispatcherFactory` (auto-resolves Dispatcher from namespace) and `Module` |
+| `src/Site/Dispatcher/Dispatcher.php` | Extends `AbstractModuleDispatcher` — overrides `getLayoutData()` to populate template variables based on display mode |
+| `src/Site/Helper/MokoHeroHelper.php` | Scans configured folder via `DirectoryIterator` for supported media; returns all items or a single random pick |
+| `tmpl/default.php` | Layout template — three render paths (image, video, slideshow) using CSS custom properties |
+| `media/css/mod_moko_hero.css` | Styles for overlay, typography, slideshow keyframes, responsive adjustments |
+| `mod_moko_hero.xml` | Extension manifest — namespace, file declarations, module parameters |
 
-## Future Enhancements (Optional)
+### Namespace
 
-Potential improvements for future iterations:
-- Support for additional license types
-- Integration with license scanning tools
-- Automated license compliance reporting
-- License header insertion in source files
-- Multi-license support for complex projects
+```
+MokoConsulting\Module\MokoHero\Site\Dispatcher\Dispatcher
+MokoConsulting\Module\MokoHero\Site\Helper\MokoHeroHelper
+```
 
-## References
+The `<namespace path="src">` directive in the manifest maps the PSR-4 root to the module's `src/` subdirectory.
 
-- [GNU GPL-3.0 License](https://www.gnu.org/licenses/gpl-3.0.html)
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [GitHub Actions Workflow Syntax](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions)
+## Display Modes
+
+### Random Mode (default)
+
+The Dispatcher calls `MokoHeroHelper::getRandomMedia($params)` which:
+1. Scans the configured folder for supported files
+2. Returns a single random item as `['url' => ..., 'type' => 'image'|'video', 'mime' => ...]`
+
+The template renders either a CSS `background-image` (images) or an autoplay `<video>` element (videos).
+
+### Slideshow Mode
+
+The Dispatcher calls `MokoHeroHelper::getAllMedia($params)` which returns all media items. The template renders multiple `.mod-moko-hero__slide` divs, each with CSS `animation-delay` and `animation-duration` properties driving a fade-in/fade-out keyframe cycle.
+
+Configuration:
+- **Slide Duration**: 2–30 seconds per slide
+- **Slide Transition**: 0.5–5 seconds crossfade
+
+## Content Structure
+
+The hero overlay follows the Cassiopeia `mod_custom` "banner" override pattern:
+
+```html
+<div class="container-banner mod-moko-hero" role="banner">
+    <!-- slides / video rendered here if applicable -->
+    <div class="overlay">
+        <div class="mod-moko-hero__text1">…</div>   <!-- WYSIWYG level 1 -->
+        <div class="mod-moko-hero__text2">…</div>   <!-- WYSIWYG level 2 -->
+        <div class="mod-moko-hero__text3">…</div>   <!-- WYSIWYG level 3 -->
+        <div class="mod-moko-hero__buttons">
+            <a class="btn btn-lg btn-primary">…</a>  <!-- up to 3 buttons -->
+        </div>
+    </div>
+</div>
+```
+
+### Buttons
+
+Up to three buttons, each with:
+- **Label** — button text (required to show)
+- **Icon** — FontAwesome class (e.g. `fas fa-arrow-right`)
+- **URL** — link destination
+- **Style** — Bootstrap button class (`btn-primary`, `btn-secondary`, `btn-outline-primary`, `btn-outline-light`, `btn-light`, `btn-dark`)
+
+Conditional rendering via `showon` — icon, URL, and style fields only appear when a label is set.
+
+## Supported Media
+
+| Type | Extensions | Render Method |
+|------|-----------|---------------|
+| Image | jpg, jpeg, png, gif, webp, avif | CSS `background-image` |
+| Video | mp4, webm, ogg, ogv | HTML `<video autoplay muted loop playsinline>` |
+
+## CSS Custom Properties
+
+All visual parameters are passed as CSS custom properties on the root element, allowing theme overrides without modifying PHP:
+
+| Property | Default | Controls |
+|----------|---------|----------|
+| `--moko-hero-height` | `70vh` | Hero section height |
+| `--moko-hero-overlay-opacity` | `0.45` | Overlay transparency |
+| `--moko-hero-overlay-color` | `#000000` | Overlay colour |
+| `--moko-hero-text-color` | `#ffffff` | Text and button colour |
+| `--moko-hero-align` | `center` | Content alignment (flex) |
+| `--moko-hero-bg-position` | `center center` | Background image focal point |
+| `--moko-hero-bg-image` | *(none)* | Background image URL (random image mode) |
+| `--moko-slideshow-count` | *(none)* | Number of slides |
+| `--moko-slideshow-duration` | *(none)* | Per-slide display time |
+| `--moko-slideshow-transition` | *(none)* | Crossfade duration |
+| `--moko-slideshow-cycle` | *(none)* | Total cycle duration |
+
+## Accessibility
+
+- `role="banner"` and `aria-label` on root element
+- Video elements have `aria-hidden="true"` and `tabindex="-1"`
+- Slideshow slides are `aria-hidden="true"` (decorative)
+- Overlay is purely CSS (`::before` pseudo-element) — no DOM impact on assistive tech
+
+## Fallback Behaviour
+
+When no media files are found in the configured folder:
+- Admin warning message is enqueued via `Factory::getApplication()->enqueueMessage()`
+- Module renders with `mod-moko-hero--no-media` class
+- CSS provides a gradient fallback background
+
+## License Sync Workflow
+
+The repository includes a GitHub Actions workflow (`download-license.yml`) for syncing GPL licenses from www.gnu.org. See [FIREWALL_CONFIGURATION.md](FIREWALL_CONFIGURATION.md) for enterprise firewall requirements and [QUICKSTART.md](QUICKSTART.md) for setup instructions.

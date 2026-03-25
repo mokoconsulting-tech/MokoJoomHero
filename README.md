@@ -1,6 +1,6 @@
-# mod_moko_hero — Joomla Hero Background Image Module
+# mod_moko_hero — Joomla Hero Media Module
 
-A Joomla 4/5 site module that displays a randomly selected image from a folder as the full-width CSS background of a hero overlay section — combining the image-scanning approach of `mod_random_image` with the visual overlay pattern of Cassiopeia's `mod_custom` banner layout override.
+A Joomla 4/5 site module that displays images and videos as full-width hero backgrounds with overlay content — supporting random selection, slideshow mode, rich text layers, and configurable call-to-action buttons.
 
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
 
@@ -23,20 +23,22 @@ A Joomla 4/5 site module that displays a randomly selected image from a folder a
 
 ## Overview
 
-`mod_moko_hero` scans a configurable image folder (relative to the Joomla root), picks a random supported image on each page load, and renders it as the `background-image` of a full-width hero block. A semi-transparent colour overlay is applied via a CSS `::before` pseudo-element — identical to the technique used by Cassiopeia's built-in banner override — so the overlay is purely decorative and does not affect accessibility.
+`mod_moko_hero` scans a configurable image folder (relative to the Joomla root), picks media on each page load — either a single random item or a full slideshow rotation — and renders it as the background of a full-width hero block. A semi-transparent colour overlay is applied via a CSS `::before` pseudo-element, following the same technique used by Cassiopeia's built-in banner override.
 
-Administrators control the hero title, body text, call-to-action button, height, overlay colour and opacity, content alignment, and background position — all from the standard Joomla module parameters UI.
+Administrators control up to three WYSIWYG text layers, three call-to-action buttons with icon and style options, hero height, overlay colour/opacity, content alignment, and background position — all from the standard Joomla module parameters UI.
 
 ## Features
 
-- **Random image selection** from any folder under the Joomla root (jpg, jpeg, png, gif, webp, avif)
+- **Random or slideshow display** — single random media item per page load, or CSS keyframe-driven slideshow with configurable duration and transition
+- **Image and video support** — jpg, jpeg, png, gif, webp, avif for images; mp4, webm, ogg, ogv for video backgrounds
 - **CSS overlay** with configurable colour and opacity via inline CSS custom properties
-- **Hero content** — title, rich-text body, and CTA button with configurable label and URL
+- **Three WYSIWYG text levels** — flexible rich-text content layers rendered over the hero
+- **Three configurable buttons** — each with label, URL, FontAwesome icon, and Bootstrap style selection
 - **Responsive** — `clamp()`-based fluid typography, `min-height` in `vh` units, mobile padding adjustments
-- **Graceful fallback** — gradient background shown when no images are found; admin warning logged
-- **Accessible** — `role="banner"`, `aria-label`, and overlay excluded from the tab order
-- **Joomla 4 / 5 compatible** — PSR-4 namespaced Helper, `HTMLHelper::_('stylesheet', …)` asset loading
-- **Zero external dependencies** — no JavaScript, no Composer packages required
+- **Graceful fallback** — gradient background shown when no media files are found; admin warning logged
+- **Accessible** — `role="banner"`, `aria-label`, video elements excluded from tab order
+- **Joomla 4/5 native DI architecture** — `services/provider.php` with `ModuleDispatcherFactory` and PSR-4 namespaced Dispatcher/Helper
+- **Zero external dependencies** — no Composer packages required; vanilla CSS animations for slideshow
 
 ## Prerequisites
 
@@ -75,9 +77,9 @@ make dev-install
 
 3. **Create a module instance** in Joomla Admin → Extensions > Modules → New → Moko Hero
 
-4. **Upload images** to your chosen folder (default: `images/headers/`)
+4. **Upload media** to your chosen folder (default: `images/headers/`)
 
-5. **Configure parameters** — set title, text, CTA, overlay colour/opacity
+5. **Configure parameters** — set text layers, buttons, display mode, overlay colour/opacity
 
 6. **Assign** the module to a full-width position (e.g. `banner` in Cassiopeia) and publish
 
@@ -92,50 +94,91 @@ make dev-install # Symlink into JOOMLA_ROOT for live development
 
 ## Module Parameters
 
-### Basic
+### Basic (Content)
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| Image Folder | `images/headers` | Path relative to Joomla root containing hero images |
-| Hero Title | *(empty)* | `<h2>` heading rendered over the image |
-| Hero Text | *(empty)* | Supporting body text (safe HTML allowed) |
-| Call-to-Action URL | *(empty)* | URL for the CTA button; leave blank to hide |
-| Button Label | `Learn More` | Text on the CTA button |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| Image Folder | folderlist | `images/headers` | Subfolder under `images/` containing hero media files |
+| Text Level 1 | WYSIWYG editor | *(empty)* | Primary rich-text content layer |
+| Text Level 2 | WYSIWYG editor | *(empty)* | Secondary rich-text content layer |
+| Text Level 3 | WYSIWYG editor | *(empty)* | Tertiary rich-text content layer |
+| Button 1 Label | text | *(empty)* | Text for button 1; leave blank to hide |
+| Button 1 Icon | text | *(empty)* | FontAwesome class (e.g. `fas fa-arrow-right`) |
+| Button 1 URL | url | *(empty)* | Link destination for button 1 |
+| Button 1 Style | list | `btn-primary` | Bootstrap button style class |
+| Button 2 Label | text | *(empty)* | Text for button 2; leave blank to hide |
+| Button 2 Icon | text | *(empty)* | FontAwesome class for button 2 |
+| Button 2 URL | url | *(empty)* | Link destination for button 2 |
+| Button 2 Style | list | `btn-outline-light` | Bootstrap button style class |
+| Button 3 Label | text | *(empty)* | Text for button 3; leave blank to hide |
+| Button 3 Icon | text | *(empty)* | FontAwesome class for button 3 |
+| Button 3 URL | url | *(empty)* | Link destination for button 3 |
+| Button 3 Style | list | `btn-secondary` | Bootstrap button style class |
 
 ### Display Settings
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| Hero Height | `70vh` | CSS height (vh, px, %) |
-| Overlay Opacity | `0.45` | 0 = transparent → 1 = solid |
-| Overlay Colour | `#000000` | Colour of the overlay layer |
-| Content Alignment | `center` | Left / Centre / Right |
-| Text Colour | `#ffffff` | Colour for title, text, and button |
-| Background Position | `center center` | Focal point of the background image |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| Display Mode | list | `random` | `random` (single item) or `slideshow` (rotate all) |
+| Slide Duration | number | `5` | Seconds each slide is visible (slideshow only, 2–30) |
+| Slide Transition | number | `1` | Crossfade transition duration in seconds (slideshow only, 0.5–5) |
+| Hero Height | text | `70vh` | CSS height value (vh, px, %) |
+| Overlay Opacity | range | `0.45` | 0 = transparent → 1 = solid |
+| Overlay Colour | color | `#000000` | Colour of the overlay layer |
+| Content Alignment | list | `center` | Left / Centre / Right |
+| Text Colour | color | `#ffffff` | Colour for all text and button content |
+| Background Position | list | `center center` | Focal point of the background media |
 
-### Supported Image Formats
+### Button Style Options
 
-`jpg`, `jpeg`, `png`, `gif`, `webp`, `avif`
+All three buttons support these Bootstrap style classes:
+- `btn-primary` — Primary
+- `btn-secondary` — Secondary
+- `btn-outline-primary` — Outline Primary
+- `btn-outline-light` — Outline Light
+- `btn-light` — Light
+- `btn-dark` — Dark
+
+### Supported Media Formats
+
+**Images:** `jpg`, `jpeg`, `png`, `gif`, `webp`, `avif`
+**Videos:** `mp4`, `webm`, `ogg`, `ogv`
 
 ## Project Structure
 
 ```
-src/mod_moko_hero/
-├── mod_moko_hero.php          # Module entry point — bootstraps helper + layout
-├── mod_moko_hero.xml          # Extension manifest (params, namespace, files)
+src/
+├── mod_moko_hero.xml              # Extension manifest (params, namespace, files)
+├── services/
+│   └── provider.php               # Joomla DI service provider (registers dispatcher)
 ├── src/
-│   └── Helper/
-│       └── MokoHeroHelper.php # PSR-4 helper — folder scan + random image URL
+│   └── Site/
+│       ├── Dispatcher/
+│       │   └── Dispatcher.php     # Module dispatcher — resolves display mode + layout data
+│       └── Helper/
+│           └── MokoHeroHelper.php # Folder scanner — image/video discovery + URL resolution
 ├── tmpl/
-│   └── default.php            # Hero layout — CSS vars + accessible markup
+│   └── default.php                # Hero layout — CSS vars, slideshow, video, accessible markup
 ├── media/
 │   └── css/
-│       └── mod_moko_hero.css  # Overlay + typography styles (CSS custom properties)
+│       └── mod_moko_hero.css      # Overlay + typography + slideshow animation styles
 └── language/
     └── en-GB/
         ├── mod_moko_hero.ini      # Frontend strings
         └── mod_moko_hero.sys.ini  # Admin (sys) strings
 ```
+
+### Architecture
+
+The module uses Joomla's native Dependency Injection module pattern:
+
+1. **`services/provider.php`** — Registers `ModuleDispatcherFactory` and `Module` with the DI container. The factory auto-resolves the `Dispatcher` class from the module's namespace.
+
+2. **`Dispatcher`** — Extends `AbstractModuleDispatcher`. Overrides `getLayoutData()` to call the Helper and populate the template variables (`mediaUrl`, `mediaType`, `slides`, `displayMode`).
+
+3. **`MokoHeroHelper`** — Scans the configured folder for supported image/video files using `DirectoryIterator`. Returns either all media items (slideshow) or a single random pick.
+
+4. **`default.php`** — Renders the hero markup using CSS custom properties for theming. Handles three render paths: single image (CSS `background-image`), single video (`<video>` element), or slideshow (multiple slide divs with CSS keyframe animations).
 
 ## Development
 
