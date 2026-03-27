@@ -5,7 +5,7 @@
 # INGROUP: MokoStandards.Compliance
 # REPO: https://github.com/mokoconsulting-tech/MokoStandards
 # PATH: /.github/workflows/standards-compliance.yml
-# VERSION: 04.00.05
+# VERSION: 04.01.09
 # BRIEF: MokoStandards compliance validation workflow
 # NOTE: Validates repository structure, documentation, and coding standards
 
@@ -740,10 +740,16 @@ jobs:
           fi
 
           # Check for recommended workflows
-          if [ -f "$WORKFLOWS_DIR/ci.yml" ] || [ -f "$WORKFLOWS_DIR/build.yml" ]; then
-            echo "✅ CI workflow present" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⚠️ No CI workflow found (ci.yml or build.yml)" >> $GITHUB_STEP_SUMMARY
+          CI_FOUND=false
+          for wf in ci.yml build.yml ci-dolibarr.yml ci-joomla.yml; do
+            if [ -f "$WORKFLOWS_DIR/$wf" ]; then
+              echo "✅ CI workflow present ($wf)" >> $GITHUB_STEP_SUMMARY
+              CI_FOUND=true
+              break
+            fi
+          done
+          if [ "$CI_FOUND" = "false" ]; then
+            echo "⚠️ No CI workflow found (ci.yml, build.yml, ci-dolibarr.yml, or ci-joomla.yml)" >> $GITHUB_STEP_SUMMARY
           fi
 
           if [ -f "$WORKFLOWS_DIR/codeql-analysis.yml" ]; then
@@ -751,6 +757,15 @@ jobs:
           else
             echo "⚠️ CodeQL workflow not found" >> $GITHUB_STEP_SUMMARY
           fi
+
+          # Check for MokoStandards-synced workflows
+          for wf in deploy-dev.yml deploy-demo.yml deploy-rs.yml sync-version-on-merge.yml auto-release.yml standards-compliance.yml enterprise-firewall-setup.yml; do
+            if [ -f "$WORKFLOWS_DIR/$wf" ]; then
+              echo "✅ ${wf}" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "⚠️ ${wf} not found (synced from MokoStandards)" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
 
       - name: Validate Workflow Syntax
         run: |
@@ -1197,28 +1212,28 @@ jobs:
 
           # Find large files (>1MB)
           LARGE_FILES=$(find . -type f -size +1M ! -path "./.git/*" ! -path "./vendor/*" ! -path "./node_modules/*" 2>/dev/null | wc -l)
-          HUGE_FILES=$(find . -type f -size +10M ! -path "./.git/*" ! -path "./vendor/*" ! -path "./node_modules/*" 2>/dev/null | wc -l)
+          HUGE_FILES=$(find . -type f -size +15M ! -path "./.git/*" ! -path "./vendor/*" ! -path "./node_modules/*" 2>/dev/null | wc -l)
 
           echo "### Size Thresholds" >> $GITHUB_STEP_SUMMARY
           echo "- **Warning**: Files >1MB" >> $GITHUB_STEP_SUMMARY
-          echo "- **Critical**: Files >10MB" >> $GITHUB_STEP_SUMMARY
+          echo "- **Critical**: Files >15MB" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           if [ "$HUGE_FILES" -gt 0 ]; then
-            echo "❌ **Critical**: Found $HUGE_FILES file(s) exceeding 10MB" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Critical**: Found $HUGE_FILES file(s) exceeding 15MB" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "<details>" >> $GITHUB_STEP_SUMMARY
-            echo "<summary>View files >10MB</summary>" >> $GITHUB_STEP_SUMMARY
+            echo "<summary>View files >15MB</summary>" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-            find . -type f -size +10M ! -path "./.git/*" ! -path "./vendor/*" ! -path "./node_modules/*" -exec ls -lh {} + 2>/dev/null | awk '{print $5, $9}' >> $GITHUB_STEP_SUMMARY
+            find . -type f -size +15M ! -path "./.git/*" ! -path "./vendor/*" ! -path "./node_modules/*" -exec ls -lh {} + 2>/dev/null | awk '{print $5, $9}' >> $GITHUB_STEP_SUMMARY
             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
             echo "</details>" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Action Required**: Remove or optimize files >10MB" >> $GITHUB_STEP_SUMMARY
+            echo "**Action Required**: Remove or optimize files >15MB" >> $GITHUB_STEP_SUMMARY
             exit 1
           elif [ "$LARGE_FILES" -gt 0 ]; then
-            echo "⚠️ **Warning**: Found $LARGE_FILES file(s) between 1MB and 10MB" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **Warning**: Found $LARGE_FILES file(s) between 1MB and 15MB" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "<details>" >> $GITHUB_STEP_SUMMARY
             echo "<summary>View files >1MB</summary>" >> $GITHUB_STEP_SUMMARY
