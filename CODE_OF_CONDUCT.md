@@ -1,79 +1,87 @@
-# Contributor Covenant Code of Conduct
+<!--	Copyright (C) 2026 Moko Consulting <hello@mokoconsulting.tech>
 
-## Our Pledge
+	This file is part of a Moko Consulting project.
 
-We as members, contributors, and leaders pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
+	SPDX-LICENSE-IDENTIFIER: GPL-3.0-or-later
 
-We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive, and healthy community.
+	This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
 
-## Our Standards
+	This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-Examples of behavior that contributes to a positive environment for our community include:
+	You should have received a copy of the GNU General Public License (./LICENSE.md).
 
-* Demonstrating empathy and kindness toward other people
-* Being respectful of differing opinions, viewpoints, and experiences
-* Giving and gracefully accepting constructive feedback
-* Accepting responsibility and apologizing to those affected by our mistakes, and learning from the experience
-* Focusing on what is best not just for us as individuals, but for the overall community
+	# FILE INFORMATION
+	DEFGROUP:
+	INGROUP: Project.Documentation
+	REPO:
+	VERSION: 04.02.30
+	PATH: ./CODE_OF_CONDUCT.md
+	BRIEF: Reference + packaging repo for Moko Consulting Developer GPT Other Default
+-->
+# Code of Conduct
 
-Examples of unacceptable behavior include:
+## 1. Purpose
 
-* The use of sexualized language or imagery, and sexual attention or advances of any kind
-* Trolling, insulting or derogatory comments, and personal or political attacks
-* Public or private harassment
-* Publishing others' private information, such as a physical or email address, without their explicit permission
-* Other conduct which could reasonably be considered inappropriate in a professional setting
+The purpose of this Code of Conduct is to ensure a safe, inclusive, and respectful environment for all contributors and participants in Moko Consulting projects. This applies to all interactions, whether in repositories, issue trackers, documentation, meetings, or community spaces.
 
-## Enforcement Responsibilities
+## 2. Our Standards
 
-Community leaders are responsible for clarifying and enforcing our standards of acceptable behavior and will take appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening, offensive, or harmful.
+Participants are expected to uphold behaviors that strengthen our community, including:
 
-Community leaders have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct, and will communicate reasons for moderation decisions when appropriate.
+ Demonstrating empathy and respect toward others.
+ Being inclusive of diverse viewpoints and backgrounds.
+ Gracefully accepting constructive feedback.
+ Prioritizing collaboration over conflict.
+ Showing professionalism in all interactions.
 
-## Scope
+### Unacceptable behavior includes:
 
-This Code of Conduct applies within all community spaces, and also applies when an individual is officially representing the community in public spaces. Examples of representing our community include using an official e-mail address, posting via an official social media account, or acting as an appointed representative at an online or offline event.
+ Harassment, discrimination, or derogatory comments.
+ Threatening or violent language or actions.
+ Disruptive, aggressive, or intentionally harmful behavior.
+ Publishing others’ private information without permission.
+ Any behavior that violates applicable laws.
 
-## Enforcement
+## 3. Responsibilities of Maintainers
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at hello@mokoconsulting.tech. All complaints will be reviewed and investigated promptly and fairly.
+Maintainers are responsible for:
 
-All community leaders are obligated to respect the privacy and security of the reporter of any incident.
+ Clarifying acceptable behavior.
+ Taking appropriate corrective action when unacceptable behavior occurs.
+ Removing, editing, or rejecting contributions that violate this Code.
+ Temporarily or permanently banning contributors who engage in repeated or severe violations.
 
-## Enforcement Guidelines
+## 4. Scope
 
-Community leaders will follow these Community Impact Guidelines in determining the consequences for any action they deem in violation of this Code of Conduct:
+This Code applies to:
 
-### 1. Correction
+ All Moko Consulting repositories.
+ All documentation and collaboration platforms.
+ Public and private communication related to project activities.
+ Any representation of Moko Consulting in online or offline spaces.
 
-**Community Impact**: Use of inappropriate language or other behavior deemed unprofessional or unwelcome in the community.
+## 5. Enforcement
 
-**Consequence**: A private, written warning from community leaders, providing clarity around the nature of the violation and an explanation of why the behavior was inappropriate. A public apology may be requested.
+Instances of misconduct may be reported to:
+**[hello@mokoconsulting.tech](mailto:hello@mokoconsulting.tech)**
 
-### 2. Warning
+All reports will be reviewed and investigated promptly and fairly. Maintainers are obligated to maintain confidentiality where possible.
 
-**Community Impact**: A violation through a single incident or series of actions.
+Consequences may include:
 
-**Consequence**: A warning with consequences for continued behavior. No interaction with the people involved, including unsolicited interaction with those enforcing the Code of Conduct, for a specified period of time. This includes avoiding interactions in community spaces as well as external channels like social media. Violating these terms may lead to a temporary or permanent ban.
+ A warning.
+ Required training or mediation.
+ Temporary or permanent bans.
+ Escalation to legal authorities when required.
 
-### 3. Temporary Ban
+## 6. Acknowledgements
 
-**Community Impact**: A serious violation of community standards, including sustained inappropriate behavior.
+This Code of Conduct is inspired by widely adopted community guidelines, including the Contributor Covenant and major open-source collaboration standards.
 
-**Consequence**: A temporary ban from any sort of interaction or public communication with the community for a specified period of time. No public or private interaction with the people involved, including unsolicited interaction with those enforcing the Code of Conduct, is allowed during this period. Violating these terms may lead to a permanent ban.
+## 7. Related Documents
 
-### 4. Permanent Ban
+ [Governance Guide](./docs-governance.md)
+ [Contributor Guide](./docs-contributing.md)
+ [Documentation Index](./docs-index.md)
 
-**Community Impact**: Demonstrating a pattern of violation of community standards, including sustained inappropriate behavior, harassment of an individual, or aggression toward or disparagement of classes of individuals.
-
-**Consequence**: A permanent ban from any sort of public interaction within the community.
-
-## Attribution
-
-This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 2.0, available at https://www.contributor-covenant.org/version/2/0/code_of_conduct.html.
-
-Community Impact Guidelines were inspired by [Mozilla's code of conduct enforcement ladder](https://github.com/mozilla/diversity).
-
-[homepage]: https://www.contributor-covenant.org
-
-For answers to common questions about this code of conduct, see the FAQ at https://www.contributor-covenant.org/faq. Translations are available at https://www.contributor-covenant.org/translations.
+This Code of Conduct is a living document and may be updated following the established Change Management process.
