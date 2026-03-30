@@ -1,273 +1,128 @@
-# Contributing to MokoStandards-Template-Joomla-Module
+<!--
+ Copyright (C) 2026 Moko Consulting <hello@mokoconsulting.tech>
 
-Thank you for your interest in contributing to this project! This document provides guidelines and instructions for contributing.
+ This file is part of a Moko Consulting project.
 
-## Table of Contents
+ SPDX-License-Identifier: GPL-3.0-or-later
 
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Process](#development-process)
-- [Coding Standards](#coding-standards)
-- [Commit Guidelines](#commit-guidelines)
-- [Pull Request Process](#pull-request-process)
-- [Reporting Issues](#reporting-issues)
-- [Questions and Support](#questions-and-support)
+ This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
 
-## Code of Conduct
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-This project and everyone participating in it is governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to hello@mokoconsulting.tech.
+ You should have received a copy of the GNU General Public License (./LICENSE).
 
-## Getting Started
+ # FILE INFORMATION
+ DEFGROUP: {{DEFGROUP}}
+ INGROUP: Project.Documentation
+ REPO: https://github.com/mokoconsulting-tech/MokoJoomHero
+ VERSION: 04.03.00
+ PATH: ./CONTRIBUTING.md
+ BRIEF: How to contribute; branch strategy, commit conventions, PR workflow, and release pipeline
+ -->
 
-### Prerequisites
+# Contributing
 
-Before contributing, ensure you have:
+Thank you for your interest in contributing to **MokoJoomHero**!
 
-- PHP 7.4 or higher installed
-- Composer installed (for dependency management)
-- PHP CodeSniffer installed (`composer global require squizlabs/php_codesniffer`)
-- A working Joomla installation for testing
-- Git installed and configured
+This repository is governed by **[MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards)** — the authoritative source of coding standards, workflows, and policies for all Moko Consulting repositories.
 
-### Setting Up Your Development Environment
+## Branch Strategy
 
-1. **Fork the repository** on GitHub
+| Branch | Purpose | Deploys To |
+|--------|---------|------------|
+| `main` | Bleeding edge — all development merges here | CI only |
+| `dev/XX.YY.ZZ` | Feature development | Dev server (version: "development") |
+| `version/XX.YY.ZZ` | Stable frozen snapshot | Demo + RS servers |
 
-2. **Clone your fork**:
-	 ```bash
-	 git clone https://github.com/your-username/MokoStandards-Template-Joomla-Module.git
-	 cd MokoStandards-Template-Joomla-Module
-	 ```
+### Development Workflow
 
-3. **Add the upstream remote**:
-	 ```bash
-	 git remote add upstream https://github.com/mokoconsulting-tech/MokoStandards-Template-Joomla-Module.git
-	 ```
+```
+1. Create branch:   git checkout -b dev/XX.YY.ZZ/my-feature
+2. Develop + test    (dev server auto-deploys on push)
+3. Open PR → main    (squash merge only)
+4. Auto-release      (version branch + tag + GitHub Release created automatically)
+```
 
-4. **Configure git commit template**:
-	 ```bash
-	 git config commit.template .gitmessage
-	 ```
+### Branch Naming
 
-5. **Install development dependencies**:
-	 ```bash
-	 composer install
-	 ```
+| Prefix | Use |
+|--------|-----|
+| `dev/XX.YY.ZZ` | Feature development (e.g., `dev/02.00.00/add-extrafields`) |
+| `version/XX.YY.ZZ` | Stable release (auto-created, never manually pushed) |
+| `chore/` | Automated sync branches (managed by MokoStandards) |
 
-## Development Process
+> **Never use** `feature/`, `hotfix/`, or `release/` prefixes — they are not part of the MokoStandards branch strategy.
 
-### Branching Strategy
+## Commit Conventions
 
-- `main` - Stable, production-ready code
-- `feat/*` - New features
-- `fix/*` - Bug fixes
-- `docs/*` - Documentation updates
-- `refactor/*` - Code refactoring
-- `chore/*` - Maintenance tasks
+Use [conventional commits](https://www.conventionalcommits.org/):
 
-### Workflow
+```
+feat(scope): add new extrafield for invoice tracking
+fix(sql): correct column type in llx_mytable
+docs(readme): update installation instructions
+chore(deps): bump enterprise library to 04.02.30
+```
 
-1. **Create a branch** from `main`:
-	 ```bash
-	 git checkout main
-	 git pull upstream main
-	 git checkout -b feat/your-feature-name
-	 ```
+**Valid types:** `feat` | `fix` | `docs` | `chore` | `ci` | `refactor` | `style` | `test` | `perf` | `revert` | `build`
 
-2. **Make your changes** following our coding standards
+## Pull Request Workflow
 
-3. **Test your changes**:
-	 ```bash
-	 make validate    # Run linters and code standards checks
-	 make build       # Build the module package
-	 ```
+1. **Branch** from `main` using `dev/XX.YY.ZZ/description` format
+2. **Bump** the patch version in `README.md` before opening the PR
+3. **Title** must be a valid conventional commit subject line
+4. **Target** `main` — squash merge only (merge commits are disabled)
+5. **CI checks** must pass before merge
 
-4. **Commit your changes** using conventional commits (see below)
+### What Happens on Merge
 
-5. **Push to your fork**:
-	 ```bash
-	 git push origin feat/your-feature-name
-	 ```
+When your PR is merged to `main`, these workflows run automatically:
 
-6. **Open a Pull Request** from your branch to `main`
+1. **sync-version-on-merge** — auto-bumps patch version, propagates to all file headers
+2. **auto-release** — creates `version/XX.YY.ZZ` branch, git tag, and GitHub Release
+3. **deploy-demo / deploy-rs** — deploys to demo and RS servers (if `src/**` changed)
 
 ## Coding Standards
 
-### PHP Standards
+All contributions must follow [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards):
 
-- Follow [Joomla Coding Standards](https://developer.joomla.org/coding-standards.html)
-- Use tabs for indentation (width: 2 spaces)
-- Use UTF-8 encoding without BOM
-- Use LF (Unix) line endings
-- Include proper DocBlocks for classes, methods, and properties
-- Use type hints where applicable
+| Standard | Reference |
+|----------|-----------|
+| Coding Style | [coding-style-guide.md](https://github.com/mokoconsulting-tech/MokoStandards/blob/main/docs/policy/coding-style-guide.md) |
+| File Headers | [file-header-standards.md](https://github.com/mokoconsulting-tech/MokoStandards/blob/main/docs/policy/file-header-standards.md) |
+| Branching | [branch-release-strategy.md](https://github.com/mokoconsulting-tech/MokoStandards/blob/main/docs/policy/branch-release-strategy.md) |
+| Merge Strategy | [merge-strategy.md](https://github.com/mokoconsulting-tech/MokoStandards/blob/main/docs/policy/merge-strategy.md) |
+| Scripting | [scripting-standards.md](https://github.com/mokoconsulting-tech/MokoStandards/blob/main/docs/policy/scripting-standards.md) |
+| Build & Release | [build-release.md](https://github.com/mokoconsulting-tech/MokoStandards/blob/main/docs/workflows/build-release.md) |
 
-### File Headers
+## PR Checklist
 
-All PHP files should include the following header:
+- [ ] Branch named `dev/XX.YY.ZZ/description`
+- [ ] Patch version bumped in `README.md`
+- [ ] Conventional commit format for PR title
+- [ ] All new files have FILE INFORMATION headers
+- [ ] `declare(strict_types=1)` in all PHP files
+- [ ] PHPDoc on all public methods
+- [ ] Tests pass
+- [ ] CHANGELOG.md updated
+- [ ] No secrets, tokens, or credentials committed
 
-```php
-<?php
-/**
- * @package     ModuleName
- * @subpackage  mod_modulename
- * @copyright   Copyright (C) 2026 Moko Consulting. All rights reserved.
- * @license     GNU General Public License version 3 or later; see LICENSE
- */
+## Custom Workflows
 
-defined('_JEXEC') or die;
-```
-
-### Code Quality
-
-Before submitting:
-
-- Run PHP syntax check: `make lint`
-- Run PHP CodeSniffer: `make phpcs`
-- Run all checks: `make validate`
-- Fix auto-fixable issues: `make phpcbf`
-
-## Commit Guidelines
-
-We follow [Conventional Commits](https://www.conventionalcommits.org/) specification.
-
-### Commit Message Format
+Place repo-specific workflows in `.github/workflows/custom/` — they are **never overwritten or deleted** by MokoStandards sync:
 
 ```
-<type>(<scope>): <subject>
-
-<body>
-
-<footer>
+.github/workflows/
+├── deploy-dev.yml              ← Synced from MokoStandards
+├── auto-release.yml            ← Synced from MokoStandards
+└── custom/                     ← Your custom workflows (safe)
+    └── my-custom-ci.yml
 ```
-
-### Types
-
-- **feat**: A new feature
-- **fix**: A bug fix
-- **docs**: Documentation only changes
-- **style**: Code style changes (formatting, missing semicolons, etc.)
-- **refactor**: Code change that neither fixes a bug nor adds a feature
-- **perf**: Performance improvements
-- **test**: Adding or updating tests
-- **build**: Changes to build system or dependencies
-- **ci**: Changes to CI configuration
-- **chore**: Other changes that don't modify src or test files
-- **revert**: Reverts a previous commit
-
-### Examples
-
-```bash
-# Feature
-feat(module): add contact form validation
-
-# Bug fix
-fix(display): correct responsive layout on mobile devices
-
-# Documentation
-docs(readme): update installation instructions
-
-# Breaking change
-feat(api)!: change module configuration structure
-
-BREAKING CHANGE: Configuration now uses nested arrays instead of flat structure
-```
-
-### Rules
-
-- Use imperative, present tense: "change" not "changed" nor "changes"
-- Don't capitalize first letter
-- No period (.) at the end
-- Keep subject line under 50 characters
-- Wrap body at 72 characters
-- Separate subject from body with a blank line
-- Use body to explain what and why vs. how
-
-## Pull Request Process
-
-### Before Submitting
-
-1. **Update documentation** if you've changed functionality
-2. **Update CHANGELOG.md** with a description of changes
-3. **Ensure all tests pass**: `make validate`
-4. **Ensure no merge conflicts** with `main`
-5. **Keep commits atomic** - one logical change per commit
-6. **Squash commits** if you have multiple small commits for one change
-
-### Pull Request Guidelines
-
-- **Title**: Use conventional commit format
-- **Description**: Explain what and why (not how)
-- **Link issues**: Use "Closes #123" or "Fixes #123"
-- **Screenshots**: Include for UI changes
-- **Breaking changes**: Clearly document any breaking changes
-- **Documentation**: Include relevant documentation updates
-
-### Review Process
-
-1. At least one maintainer must review and approve
-2. All CI checks must pass
-3. No unresolved review comments
-4. Branch must be up to date with `main`
-
-### After Merge
-
-- Delete your feature branch
-- Pull the latest `main` branch
-- Update your fork
-
-## Reporting Issues
-
-### Bug Reports
-
-When reporting bugs, include:
-
-- **Clear title**: Brief description of the issue
-- **Environment**: PHP version, Joomla version, OS
-- **Steps to reproduce**: Numbered list of steps
-- **Expected behavior**: What should happen
-- **Actual behavior**: What actually happens
-- **Screenshots**: If applicable
-- **Error messages**: Full error text or stack traces
-
-### Feature Requests
-
-When requesting features, include:
-
-- **Clear title**: Brief description of the feature
-- **Problem statement**: What problem does this solve?
-- **Proposed solution**: How should it work?
-- **Alternatives considered**: Other approaches you've thought about
-- **Additional context**: Any other relevant information
-
-### Issue Labels
-
-- `bug` - Something isn't working
-- `enhancement` - New feature or request
-- `documentation` - Improvements or additions to documentation
-- `good first issue` - Good for newcomers
-- `help wanted` - Extra attention is needed
-- `question` - Further information is requested
-
-## Questions and Support
-
-- **Documentation**: Check the [docs/](docs/) directory first
-- **Issues**: Search existing issues before creating new ones
-- **Email**: hello@mokoconsulting.tech
-- **Discussions**: Use GitHub Discussions for general questions
-
-## Development Resources
-
-- [Joomla Developer Documentation](https://docs.joomla.org/Developer_Documentation)
-- [Joomla Coding Standards](https://developer.joomla.org/coding-standards.html)
-- [PHP The Right Way](https://phptherightway.com/)
-- [Conventional Commits](https://www.conventionalcommits.org/)
-- [Semantic Versioning](https://semver.org/)
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the GNU General Public License v3.0 or later.
+By contributing, you agree that your contributions will be licensed under the [GPL-3.0-or-later](LICENSE) license.
 
 ---
 
-Thank you for contributing to MokoStandards-Template-Joomla-Module!
+*This file is synced from [MokoStandards](https://github.com/mokoconsulting-tech/MokoStandards). Do not edit directly — changes will be overwritten on the next sync.*
