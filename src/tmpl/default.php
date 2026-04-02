@@ -46,6 +46,8 @@ $overlayColor    = $params->get('overlay_color', '#000000');
 $contentAlign    = $params->get('content_align', 'center');
 $textColor       = $params->get('text_color', '#ffffff');
 $bgPosition      = $params->get('bg_position', 'center center');
+$borderRadius    = $params->get('border_radius', '0');
+$bgColor         = $params->get('bg_color', '#1a1a2e');
 $slideDuration   = (int) $params->get('slide_duration', 5);
 $slideTransition = (float) $params->get('slide_transition', 1.0);
 
@@ -92,6 +94,8 @@ $cssVars = [
     '--moko-hero-text-color:'      . htmlspecialchars($textColor,    ENT_QUOTES, 'UTF-8'),
     '--moko-hero-align:'           . htmlspecialchars($contentAlign, ENT_QUOTES, 'UTF-8'),
     '--moko-hero-bg-position:'     . htmlspecialchars($bgPosition,   ENT_QUOTES, 'UTF-8'),
+    '--moko-hero-border-radius:'   . htmlspecialchars($borderRadius, ENT_QUOTES, 'UTF-8'),
+    '--moko-hero-bg-color:'        . htmlspecialchars($bgColor,      ENT_QUOTES, 'UTF-8'),
 ];
 
 if ($isImage) {

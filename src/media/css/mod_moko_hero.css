@@ -35,8 +35,11 @@
     background-position: var(--moko-hero-bg-position, center center);
     background-repeat: no-repeat;
 
-    /* Fallback colour when no media is found */
-    background-color: #1a1a2e;
+    /* Fallback / base background colour (configurable via module params) */
+    background-color: var(--moko-hero-bg-color, #1a1a2e);
+
+    /* Border radius (configurable via module params) */
+    border-radius: var(--moko-hero-border-radius, 0);
 }
 
 /* ── Colour overlay via ::before ────────────────────────────────────────────── */

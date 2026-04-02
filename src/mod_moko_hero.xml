@@ -332,6 +332,24 @@
                     <option value="center bottom">MOD_MOKO_HERO_BG_BOTTOM</option>
                 </field>
 
+                <!-- ── Theme / CSS options ──────────────────────────────── -->
+
+                <field
+                    name="border_radius"
+                    type="text"
+                    label="MOD_MOKO_HERO_FIELD_BORDER_RADIUS_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_BORDER_RADIUS_DESC"
+                    default="0"
+                />
+
+                <field
+                    name="bg_color"
+                    type="color"
+                    label="MOD_MOKO_HERO_FIELD_BG_COLOR_LABEL"
+                    description="MOD_MOKO_HERO_FIELD_BG_COLOR_DESC"
+                    default="#1a1a2e"
+                />
+
             </fieldset>
 
         </fields>
