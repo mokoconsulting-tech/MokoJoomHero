@@ -1,6 +1,6 @@
-# MokoStandards-Template-Joomla-Module
+# mod_moko_hero — Joomla Hero Media Module
 
-A repository template for Joomla Module development projects following MokoStandards.
+A Joomla 4/5 site module that displays images and videos as full-width hero backgrounds with overlay content — supporting random selection, slideshow mode, rich text layers, and configurable call-to-action buttons.
 
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
 
@@ -11,116 +11,174 @@ A repository template for Joomla Module development projects following MokoStand
 3. [Prerequisites](#prerequisites)
 4. [Installation](#installation)
 5. [Usage](#usage)
-6. [Project Structure](#project-structure)
-7. [Development](#development)
-8. [Testing](#testing)
-9. [Building](#building)
-10. [Contributing](#contributing)
-11. [Versioning](#versioning)
-12. [License](#license)
-13. [Support](#support)
+6. [Module Parameters](#module-parameters)
+7. [Project Structure](#project-structure)
+8. [Development](#development)
+9. [Testing](#testing)
+10. [Building](#building)
+11. [Contributing](#contributing)
+12. [Versioning](#versioning)
+13. [License](#license)
+14. [Support](#support)
 
 ## Overview
 
-This is a standardized template repository for creating Joomla modules that conform to Moko Consulting's development standards and best practices. It provides a consistent starting point with pre-configured tooling, documentation structure, and development workflows.
+`mod_moko_hero` scans a configurable image folder (relative to the Joomla root), picks media on each page load — either a single random item or a full slideshow rotation — and renders it as the background of a full-width hero block. A semi-transparent colour overlay is applied via a CSS `::before` pseudo-element, following the same technique used by Cassiopeia's built-in banner override.
 
-Use this template when creating new Joomla modules to ensure:
-- Consistent code structure and organization
-- Pre-configured development tools (linters, formatters)
-- Standardized documentation and contribution guidelines
-- Built-in build and deployment workflows
+Administrators control up to three WYSIWYG text layers, three call-to-action buttons with icon and style options, hero height, overlay colour/opacity, content alignment, and background position — all from the standard Joomla module parameters UI.
 
 ## Features
 
-- **Standardized Structure**: Pre-organized directories for source code, documentation, and scripts
-- **Build Automation**: Makefile with common tasks (lint, build, package, install)
-- **Code Quality**: Pre-configured PHP linting and CodeSniffer for Joomla standards
-- **Development Tools**: EditorConfig for consistent coding styles across IDEs
-- **Documentation**: Template structure following MokoStandards documentation practices
-- **Git Configuration**: Pre-configured git attributes, ignore patterns, and commit message templates
+- **Random or slideshow display** — single random media item per page load, or CSS keyframe-driven slideshow with configurable duration and transition
+- **Image and video support** — jpg, jpeg, png, gif, webp, avif for images; mp4, webm, ogg, ogv for video backgrounds
+- **CSS overlay** with configurable colour and opacity via inline CSS custom properties
+- **Three WYSIWYG text levels** — flexible rich-text content layers rendered over the hero
+- **Three configurable buttons** — each with label, URL, FontAwesome icon, and Bootstrap style selection
+- **Responsive** — `clamp()`-based fluid typography, `min-height` in `vh` units, mobile padding adjustments
+- **Graceful fallback** — gradient background shown when no media files are found; admin warning logged
+- **Accessible** — `role="banner"`, `aria-label`, video elements excluded from tab order
+- **Joomla 4/5 native DI architecture** — `services/provider.php` with `ModuleDispatcherFactory` and PSR-4 namespaced Dispatcher/Helper
+- **Zero external dependencies** — no Composer packages required; vanilla CSS animations for slideshow
 
 ## Prerequisites
 
-Before using this template, ensure you have the following installed:
-
-- **PHP**: 7.4 or higher (8.0+ recommended for Joomla 4.x/5.x)
-- **Composer**: For PHP dependency management (optional but recommended)
-- **Joomla**: A working Joomla installation for testing (3.x, 4.x, or 5.x)
-- **PHP CodeSniffer**: For code quality checks (`composer global require squizlabs/php_codesniffer`)
-- **Make**: GNU Make for running build commands
+- **PHP**: 8.1 or higher (Joomla 4.4 / 5.x requirement)
+- **Joomla**: 4.4 or 5.x site installation for testing
+- **PHP CodeSniffer** *(optional)*: `composer global require squizlabs/php_codesniffer` for code-quality checks
+- **Make**: GNU Make for build commands
 - **Git**: For version control
 
 ## Installation
 
-### Using This Template
+### Via Joomla Extension Manager (recommended)
 
-1. **Create a new repository from this template**:
-	 - Click "Use this template" button on GitHub
-	 - Or clone and remove git history:
-		 ```bash
-		 git clone https://github.com/mokoconsulting-tech/MokoStandards-Template-Joomla-Module.git my-joomla-module
-		 cd my-joomla-module
-		 rm -rf .git
-		 git init
-		 ```
+1. Run `make build` to produce `dist/mod_moko_hero.zip`
+2. In Joomla Admin → **Extensions > Manage > Install**, upload the ZIP
+3. Go to **Extensions > Modules**, create a new **Moko Hero** module
+4. Set the **Image Folder** parameter (e.g. `images/headers`) and assign the module to a position
 
-2. **Customize for your module**:
-	 - Update `Makefile` with your module name, type, and version
-	 - Update this README with your module's specific information
-	 - Update LICENSE file with appropriate copyright holder
-	 - Create your module files in the `src/` directory
+### Development Symlink
 
-3. **Initialize git**:
-	 ```bash
-	 git add .
-	 git commit -m "feat: initial commit from template"
-	 ```
+```bash
+# Set JOOMLA_ROOT in the Makefile first
+make dev-install
+```
 
 ## Usage
 
 ### Quick Start
 
-1. **Configure your module** in the `Makefile`:
-	 ```makefile
-	 MODULE_NAME := yourmodulename
-	 MODULE_TYPE := site    # or 'admin' for backend modules
-	 MODULE_VERSION := 1.0.0
-	 ```
+1. **Build the package**:
+   ```bash
+   make build
+   ```
 
-2. **Run the help command** to see available tasks:
-	 ```bash
-	 make help
-	 ```
+2. **Install** the generated `dist/mod_moko_hero.zip` in your Joomla site
 
-3. **Develop your module** in the `src/` directory
+3. **Create a module instance** in Joomla Admin → Extensions > Modules → New → Moko Hero
 
-4. **Validate your code**:
-	 ```bash
-	 make validate
-	 ```
+4. **Upload media** to your chosen folder (default: `images/headers/`)
 
-5. **Build the module package**:
-	 ```bash
-	 make build
-	 ```
+5. **Configure parameters** — set text layers, buttons, display mode, overlay colour/opacity
 
-### Common Tasks
+6. **Assign** the module to a full-width position (e.g. `banner` in Cassiopeia) and publish
 
-See the [Development Guide](docs/DEVELOPMENT.md) for detailed development workflows.
+### Common Make Tasks
+
+```bash
+make help        # List all available tasks
+make validate    # PHP lint + CodeSniffer
+make build       # Create dist/mod_moko_hero.zip
+make dev-install # Symlink into JOOMLA_ROOT for live development
+```
+
+## Module Parameters
+
+### Basic (Content)
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| Image Folder | folderlist | `images/headers` | Subfolder under `images/` containing hero media files |
+| Text Level 1 | WYSIWYG editor | *(empty)* | Primary rich-text content layer |
+| Text Level 2 | WYSIWYG editor | *(empty)* | Secondary rich-text content layer |
+| Text Level 3 | WYSIWYG editor | *(empty)* | Tertiary rich-text content layer |
+| Button 1 Label | text | *(empty)* | Text for button 1; leave blank to hide |
+| Button 1 Icon | text | *(empty)* | FontAwesome class (e.g. `fas fa-arrow-right`) |
+| Button 1 URL | url | *(empty)* | Link destination for button 1 |
+| Button 1 Style | list | `btn-primary` | Bootstrap button style class |
+| Button 2 Label | text | *(empty)* | Text for button 2; leave blank to hide |
+| Button 2 Icon | text | *(empty)* | FontAwesome class for button 2 |
+| Button 2 URL | url | *(empty)* | Link destination for button 2 |
+| Button 2 Style | list | `btn-outline-light` | Bootstrap button style class |
+| Button 3 Label | text | *(empty)* | Text for button 3; leave blank to hide |
+| Button 3 Icon | text | *(empty)* | FontAwesome class for button 3 |
+| Button 3 URL | url | *(empty)* | Link destination for button 3 |
+| Button 3 Style | list | `btn-secondary` | Bootstrap button style class |
+
+### Display Settings
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| Display Mode | list | `random` | `random` (single item) or `slideshow` (rotate all) |
+| Slide Duration | number | `5` | Seconds each slide is visible (slideshow only, 2–30) |
+| Slide Transition | number | `1` | Crossfade transition duration in seconds (slideshow only, 0.5–5) |
+| Hero Height | text | `70vh` | CSS height value (vh, px, %) |
+| Overlay Opacity | range | `0.45` | 0 = transparent → 1 = solid |
+| Overlay Colour | color | `#000000` | Colour of the overlay layer |
+| Content Alignment | list | `center` | Left / Centre / Right |
+| Text Colour | color | `#ffffff` | Colour for all text and button content |
+| Background Position | list | `center center` | Focal point of the background media |
+
+### Button Style Options
+
+All three buttons support these Bootstrap style classes:
+- `btn-primary` — Primary
+- `btn-secondary` — Secondary
+- `btn-outline-primary` — Outline Primary
+- `btn-outline-light` — Outline Light
+- `btn-light` — Light
+- `btn-dark` — Dark
+
+### Supported Media Formats
+
+**Images:** `jpg`, `jpeg`, `png`, `gif`, `webp`, `avif`
+**Videos:** `mp4`, `webm`, `ogg`, `ogv`
 
 ## Project Structure
 
 ```
-.
-├── docs/               # Documentation files
-├── scripts/            # Build and deployment scripts
-├── src/                # Module source code
-├── .editorconfig       # Editor configuration
-├── .gitignore          # Git ignore patterns
-├── .gitmessage         # Git commit message template
-├── Makefile            # Build automation
-└── README.md           # This file
+src/
+├── mod_moko_hero.xml              # Extension manifest (params, namespace, files)
+├── services/
+│   └── provider.php               # Joomla DI service provider (registers dispatcher)
+├── src/
+│   └── Site/
+│       ├── Dispatcher/
+│       │   └── Dispatcher.php     # Module dispatcher — resolves display mode + layout data
+│       └── Helper/
+│           └── MokoHeroHelper.php # Folder scanner — image/video discovery + URL resolution
+├── tmpl/
+│   └── default.php                # Hero layout — CSS vars, slideshow, video, accessible markup
+├── media/
+│   └── css/
+│       └── mod_moko_hero.css      # Overlay + typography + slideshow animation styles
+└── language/
+    └── en-GB/
+        ├── mod_moko_hero.ini      # Frontend strings
+        └── mod_moko_hero.sys.ini  # Admin (sys) strings
 ```
+
+### Architecture
+
+The module uses Joomla's native Dependency Injection module pattern:
+
+1. **`services/provider.php`** — Registers `ModuleDispatcherFactory` and `Module` with the DI container. The factory auto-resolves the `Dispatcher` class from the module's namespace.
+
+2. **`Dispatcher`** — Extends `AbstractModuleDispatcher`. Overrides `getLayoutData()` to call the Helper and populate the template variables (`mediaUrl`, `mediaType`, `slides`, `displayMode`).
+
+3. **`MokoHeroHelper`** — Scans the configured folder for supported image/video files using `DirectoryIterator`. Returns either all media items (slideshow) or a single random pick.
+
+4. **`default.php`** — Renders the hero markup using CSS custom properties for theming. Handles three render paths: single image (CSS `background-image`), single video (`<video>` element), or slideshow (multiple slide divs with CSS keyframe animations).
 
 ## Development
 
