@@ -455,7 +455,7 @@ jobs:
           [ ! -d "$SOURCE_DIR" ] && { echo "No src/ or htdocs/ — skipping package"; exit 0; }
 
           cd "$SOURCE_DIR"
-          zip -r "/tmp/${PACKAGE_NAME}" . -x '*.git*' '*.DS_Store' 'Thumbs.db' '*.log'
+          zip -r "/tmp/${PACKAGE_NAME}" .
           cd ..
 
           FILESIZE=$(stat -c%s "/tmp/${PACKAGE_NAME}" 2>/dev/null || stat -f%z "/tmp/${PACKAGE_NAME}" 2>/dev/null || echo "unknown")
