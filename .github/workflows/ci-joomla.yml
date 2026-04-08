@@ -9,7 +9,7 @@
 # INGROUP: MokoStandards.CI
 # REPO: https://github.com/mokoconsulting-tech/MokoStandards
 # PATH: /templates/workflows/joomla/ci-joomla.yml.template
-# VERSION: 04.05.13
+# VERSION: 04.06.00
 # BRIEF: CI workflow for Joomla extensions — lint, validate, test
 # NOTE: Deployed to .github/workflows/ci-joomla.yml in governed Joomla extension repos.
 
@@ -57,7 +57,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
         run: |
-          git clone --depth 1 --branch version/04.05 --quiet \
+          git clone --depth 1 --branch version/04 --quiet \
             "https://x-access-token:${GH_TOKEN}@github.com/mokoconsulting-tech/MokoStandards.git" \
             /tmp/mokostandards
 
